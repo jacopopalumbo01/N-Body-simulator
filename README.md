@@ -1,7 +1,7 @@
 # N-bodyi
 
 ## About
-
+Serial and parallel N-body simulator developed for Polimi Advanced Methods for Scientific Computing project
 ---
 
 ## Students
