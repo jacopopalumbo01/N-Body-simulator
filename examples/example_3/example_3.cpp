@@ -8,7 +8,7 @@
 int main()
 {
     NBodyEnv::GravParticle testGravParticle(NBodyEnv::gravitational,
-                                            {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, 1.2, 1e5);
+                                            {1.0, 1.0, 1.0}, {1.0, 0.0, 0.0}, 1.2, 1e7);
 
     std::cout << "  Mass : " << testGravParticle.getSpecInfo() << " kg" << std::endl;
     std::cout << "  Position: {" << testGravParticle.getPos().xPos << ", "
@@ -20,7 +20,7 @@ int main()
 
     // create another gravParticle
     NBodyEnv::GravParticle testGravParticle2(NBodyEnv::gravitational,
-                                             {30.0, 30.0, 30.0}, {0.0, -1.0, 0.0}, 1.1, 1e5);
+                                             {30.0, 30.0, 30.0}, {0.0, -1.0, 0.0}, 1.1, 1e7);
 
     std::cout << "  Mass : " << testGravParticle2.getSpecInfo() << " kg" << std::endl;
     std::cout << "  Position: {" << testGravParticle2.getPos().xPos << ", "

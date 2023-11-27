@@ -15,3 +15,7 @@ message(STATUS)
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS)
 
+add_executable(GnuPlotEx
+    ../example_gnuplot/example_gnu.cpp
+    ${HEADER_FILES}
+    )
