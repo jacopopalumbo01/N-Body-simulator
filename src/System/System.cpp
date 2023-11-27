@@ -1,5 +1,4 @@
 #include "System.hpp"
-#include <iostream>
 
 namespace NBodyEnv {
 void System::addParticle(Particle particle) {
@@ -15,7 +14,16 @@ void System::compute() {
        iter++) {
     for (auto secIter = iter + 1; secIter != _systemParticles.end();
          secIter++) {
-      // Compute new data
+      // Compute new force
+      iter->computeForce(*secIter, _func);
+
+      // Update position
+      iter->updatePos(_deltaTime);
+      secIter->updatePos(_deltaTime);
+
+      // Update velocity
+      iter->updateVel(_deltaTime);
+      secIter->updateVel(_deltaTime);
     }
   }
 }

@@ -35,10 +35,9 @@ struct Force {
 // ABSTRACT CLASS for generic particle
 class Particle {
 public:
-  Particle(ParticleType type, ParticleType specInfo, Pos pos, Vel vel,
-           double radius)
-      : _type(type), _specInfo(specInfo), _pos(pos), _vel(vel),
-        _radius(radius){};
+  Particle(ParticleType type, Pos pos, Vel vel, double specInfo, double radius)
+      : _type(type), _pos(pos), _vel(vel), _force({0, 0, 0}),
+        _specInfo(specInfo), _radius(radius){};
 
   // GETTERS
   const Pos &getPos() const { return _pos; }
@@ -66,6 +65,23 @@ public:
     _force.yForce += force.yForce;
     _force.zForce += force.zForce;
   }
+
+  // Automatically update position
+  void updatePos(double deltaTime) {
+    setPos({_pos.xPos + _vel.xVel * deltaTime,
+            _pos.yPos + _vel.yVel * deltaTime,
+            _pos.zPos + _vel.zVel * deltaTime});
+  }
+
+  // Automatically update velocity
+  void updateVel(double deltaTime) {
+    setVel({_vel.xVel + _force.xForce * deltaTime / _specInfo,
+            _vel.yVel + _force.yForce * deltaTime / _specInfo,
+            _vel.zVel + _force.zForce * deltaTime / _specInfo});
+  }
+
+  // Print particle infos
+  void print() const;
 
   ~Particle() = default;
 
