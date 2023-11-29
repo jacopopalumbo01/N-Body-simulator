@@ -7,9 +7,9 @@ with open('example.txt') as f:
 result_list = []
 
 for i in range(len(lines)):
-    if("Position" in lines[i]):
+    if("PART" in lines[i]):
         matches = re.findall(r'\{([^}]+)\}', lines[i])
-        result_list.append([float(value) for match in matches for value in match.split(',')])
+        result_list.append([float(value) for match in matches for value in match.split(' ')])
         print(result_list)
 
 

@@ -2,93 +2,97 @@
 
 #define PARTICLE
 
-namespace NBodyEnv
-{
+#include <functional>
+namespace NBodyEnv {
 
-  // Defines the type of particle
-  enum ParticleType
-  {
-    gravitational,
-    em
-  };
+// Defines the type of particle
+enum ParticleType { gravitational, em };
 
-  struct Pos
-  {
-    double xPos;
-    double yPos;
-    double zPos;
-  };
+struct Pos {
+  double xPos;
+  double yPos;
+  double zPos;
+};
 
-  struct Vel
-  {
-    double xVel;
-    double yVel;
-    double zVel;
-  };
+struct Vel {
+  double xVel;
+  double yVel;
+  double zVel;
+};
 
-  struct Force
-  {
-    double xForce;
-    double yForce;
-    double zForce;
-  };
+struct Force {
+  double xForce;
+  double yForce;
+  double zForce;
+  // Invert force
+  void invert() {
+    xForce = -xForce;
+    yForce = -yForce;
+    zForce = -zForce;
+  }
+};
 
-  // ABSTRACT CLASS for generic particle
-  class Particle
-  {
-  public:
-    // TODO: may remove parameter type, since it's implicit in the derived class object that is being instantiated
-    Particle(ParticleType type, Pos pos, Vel vel, double radius)
-        // : _type(type), _specInfo(specInfo), _pos(pos), _vel(vel){};
-        : _type(type), _pos(pos), _vel(vel), _radius(radius){};
+// ABSTRACT CLASS for generic particle
+class Particle {
+public:
+  Particle(ParticleType type, Pos pos, Vel vel, double specInfo, double radius)
+      : _type(type), _pos(pos), _vel(vel), _force({0, 0, 0}),
+        _specInfo(specInfo), _radius(radius){};
 
-    // GETTERS
-    // declare abstract method to get the particle type
-    virtual const ParticleType getType() const = 0;
-    const Pos &getPos() const { return _pos; }
-    const Vel &getVel() const { return _vel; }
-    const Force &getForce() const { return _force; }
-    const double &getRadius() const { return _radius; }
-    // const ParticleType &getType() const { return _type; }
-    // const double &getSpecInfo() const { return _specInfo; }
+  // GETTERS
+  const Pos &getPos() const { return _pos; }
+  const Vel &getVel() const { return _vel; }
+  const Force &getForce() const { return _force; }
+  const double &getRadius() const { return _radius; }
+  const ParticleType &getType() const { return _type; }
+  const double &getSpecInfo() const { return _specInfo; }
 
-    // SETTERS
-    void setPos(Pos pos) { _pos = pos; }
-    void setVel(Vel vel) { _vel = vel; }
-    void setForce(Force force) { _force = force; }
-    // this shoudn't be necessary since the radius is set in the constructor
-    // void setRadius(double radius) { _radius = radius; }
+  // SETTERS
+  void setPos(Pos pos) { _pos = pos; }
+  void setVel(Vel vel) { _vel = vel; }
+  void setForce(Force force) { _force = force; }
 
-    // declare as pure virtual function, will be overriden by derived classes EMParticle and GravParticle
-    // TODO: do the same for the type. Maybe even remove this and directly declare the analogous method
-    // in the derived classes
-    virtual const double &getSpecInfo() const = 0;
+  // Compute the force between Particle and another particle. The std::function
+  // func modifies forcess of both particles.
+  void computeForce(Particle &p2,
+                    const std::function<void(Particle &, Particle &)> &func) {
+    func(*this, p2);
+  }
 
-    virtual const Force &computeForce(const Particle &p2) const = 0;
+  // Add new force contribution
+  void addForce(const Force &force) {
+    _force.xForce += force.xForce;
+    _force.yForce += force.yForce;
+    _force.zForce += force.zForce;
+  }
 
-    // method that inverts the components of the force
-    void invertForce() 
-    { 
-      _force.xForce = -_force.xForce;
-      _force.yForce = -_force.yForce;
-      _force.zForce = -_force.zForce;
-    }
+  // Automatically update position
+  void updatePos(double deltaTime) {
+    setPos({_pos.xPos + _vel.xVel * deltaTime,
+            _pos.yPos + _vel.yVel * deltaTime,
+            _pos.zPos + _vel.zVel * deltaTime});
+  }
 
-    // virtual method to compute the generic force between two particles
-    // problem since the force is different for different types of particles, while the parameter for the generic
-    // force is the generic particle ==> signature of the method should change in the derived classes
-    // virtual const double &computeForce(const Particle &p2) const = 0;
+  // Automatically update velocity
+  void updateVel(double deltaTime) {
+    setVel({_vel.xVel + _force.xForce * deltaTime / _specInfo,
+            _vel.yVel + _force.yForce * deltaTime / _specInfo,
+            _vel.zVel + _force.zForce * deltaTime / _specInfo});
+  }
 
-    virtual ~Particle() = default;
+  // Print particle infos
+  void print() const;
 
-  private:
-    ParticleType _type;
-    Pos _pos;
-    Vel _vel;
-    Force _force;
-    // double _specInfo;
-    double _radius;
-  };
+  ~Particle() = default;
+
+private:
+  ParticleType _type;
+  Pos _pos;
+  Vel _vel;
+  Force _force;
+  double _specInfo;
+  double _radius;
+};
 } // namespace NBodyEnv
 
-#endif // !DEBUG
+#endif

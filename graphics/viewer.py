@@ -11,7 +11,7 @@ import ast
 with open('prova_out.txt') as f:
     input_string = f.readlines()
 
-N = 100
+N = 1000
 N_part = 2
 
 input_string = input_string[0]
@@ -38,8 +38,6 @@ a[1][2] = -100000000
 N = 50
 N_part = 5
 
-
-
 #To have random numbers
 a = np.random.rand(N*N_part, 3)*30
 a[0] = [100,100,100]
@@ -56,8 +54,7 @@ a =
 etc]
 
 t timespan
-
-    """
+"""
 
 t = np.array([np.ones(N_part)*i for i in range(N)]).flatten()
 df = pd.DataFrame({"time": t ,"x" : a[:,0], "y" : a[:,1], "z" : a[:,2]})
