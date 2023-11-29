@@ -15,6 +15,7 @@ public:
   void compute();
   void addParticle(Particle particle);
   const Particle &getParticle(int index) const;
+  const std::vector<Particle> &getParticles() const { return _systemParticles; }
 
 private:
   std::vector<NBodyEnv::Particle> _systemParticles;
