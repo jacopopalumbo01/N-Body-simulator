@@ -17,12 +17,14 @@ set(HEADER_FILES
     ../../src/Particle/Particle.hpp
     ../../src/System/System.hpp
     ../../src/Functions/Functions.hpp
+    ../../src/Exporter/Exporter.hpp
     )
 
 add_library(NBodyEnvLibrary
 ../../src/Particle/Particle.cpp
 ../../src/System/System.cpp
 ../../src/Functions/Functions.cpp
+../../src/Exporter/Exporter.cpp
 )
 
 add_executable(Example
