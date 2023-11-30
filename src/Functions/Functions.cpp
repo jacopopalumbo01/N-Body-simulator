@@ -3,6 +3,7 @@
 
 namespace NBodyEnv {
 void Functions::getGrav(Particle &p1, Particle &p2) {
+
   // Dummy force
   Force dummyForce{0.0, 0.0, 0.0};
 
@@ -12,6 +13,11 @@ void Functions::getGrav(Particle &p1, Particle &p2) {
   double zDistance = p1.getPos().zPos - p2.getPos().zPos;
   double distance = sqrt(xDistance * xDistance + yDistance * yDistance +
                          zDistance * zDistance);
+
+  // Detect collision
+  if (distance <= p1.getRadius() + p2.getRadius()) {
+    return;
+  }
 
   // Calculate mass product
   double totMass = p1.getSpecInfo() * p2.getSpecInfo();

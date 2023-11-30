@@ -7,20 +7,21 @@
 int main(int argc, char *argv[]) {
   NBodyEnv::System testSystem(NBodyEnv::Functions::getGravFunc(), 1.0);
 
-  NBodyEnv::Particle particleOne(NBodyEnv::gravitational, {0, 0, 0}, {0, 0, 0},
-                                 2e30, 0.5);
-  NBodyEnv::Particle particleTwo(NBodyEnv::gravitational, {0, 15e7, 0},
-                                 {29722, 0, 0}, 6e24, 0.5);
+  NBodyEnv::Particle particleOne(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
+                                 {5e-3, 0.0, 0.0}, 1.0e10, 50);
+  NBodyEnv::Particle particleTwo(NBodyEnv::gravitational, {0.0, -1000.0, 0.0},
+                                 {-5e-3, 0.0, 0.0}, 1.0e10, 50);
 
   testSystem.addParticle(particleOne);
   testSystem.addParticle(particleTwo);
 
   // Create exporter
-  NBodyEnv::Exporter exporter("test.part", 0.5);
+  NBodyEnv::Exporter exporter("test.part", 1.0);
 
-  for (int i = 0; i < 10000; i++) {
+  for (int i = 0; i < 3600 * 24 * 7; i++) {
     testSystem.compute();
-    exporter.saveState(testSystem.getParticles());
+    if (i % 3600 == 0)
+      exporter.saveState(testSystem.getParticles());
   }
 
   exporter.close();
