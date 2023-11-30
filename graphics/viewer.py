@@ -27,12 +27,14 @@ result_array = np.array(result_list_of_lists)
 
 a = result_array
 
-a[0][0] = 100000000
-a[0][1] = 100000000
-a[0][2] = 100000000
-a[1][0] = -100000000
-a[1][1] = -100000000
-a[1][2] = -100000000
+a[0][0] = 1e14
+a[0][1] = 1e14
+a[0][2] = 1e14
+a[1][0] = -1e14
+a[1][1] = -1e14
+a[1][2] = -1e14
+
+print(a)
 
 """
 N = 50
@@ -73,6 +75,6 @@ data=df[df['time']==0]
 graph = ax.scatter(data.x, data.y, data.y)
 
 ani = matplotlib.animation.FuncAnimation(fig, update_graph, (N-1),
-                               interval=200, blit=False)
+                               interval=100, blit=False)
 
 ani.save("N-Body-simulator.mp4")
