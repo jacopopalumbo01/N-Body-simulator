@@ -2,6 +2,7 @@
 #define EXPORTER
 
 #include "../Particle/Particle.hpp"
+#include "../Particle/ParticleVerlet.hpp"
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -15,6 +16,7 @@ public:
     _expFile.open(path);
   }
   void saveState(std::vector<NBodyEnv::Particle>);
+  void saveState(std::vector<NBodyEnv::ParticleVerlet>);
   void close() { _expFile.close(); }
 
 private:

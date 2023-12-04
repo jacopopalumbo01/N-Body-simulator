@@ -2,6 +2,7 @@
 #define FUNCTIONS
 
 #include "../Particle/Particle.hpp"
+#include "../Particle/ParticleVerlet.hpp"
 #include <functional>
 
 namespace NBodyEnv {
@@ -12,6 +13,10 @@ public:
   static void getGrav(Particle &p1, Particle &p2);
   static std::function<void(Particle &, Particle &)> getGravFunc() {
     return getGrav;
+  }
+  static void getGravVerlet(ParticleVerlet &p1, ParticleVerlet &p2);
+  static std::function<void(ParticleVerlet &, ParticleVerlet &)> getGravFuncVerlet() {
+    return getGravVerlet;
   }
 };
 } // namespace NBodyEnv

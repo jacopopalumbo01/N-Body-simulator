@@ -1,7 +1,7 @@
 import numpy as np
 
 # Specify the path to your file
-file_path = './test.part'
+file_path = './testVerlet.part'
 
 # Initialize empty lists to store data
 data_list = []
