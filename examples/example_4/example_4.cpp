@@ -1,10 +1,15 @@
-#include "../../src/Exporter/Exporter.hpp"
-#include "../../src/Functions/Functions.hpp"
-#include "../../src/Particle/Particle.hpp"
-#include "../../src/System/System.hpp"
+#include "../../inc/Collisions/SphereBoundary.hpp"
+#include "../../inc/Exporter/Exporter.hpp"
+#include "../../inc/Functions/Functions.hpp"
+#include "../../inc/Particle/Particle.hpp"
+#include "../../inc/System/System.hpp"
 #include <iostream>
 
 int main(int argc, char *argv[]) {
+
+  // Create a sphere boundary
+  NBodyEnv::SphereBoundary boundary({0.0, 0.0, 0.0}, 1e10);
+
   NBodyEnv::System testSystem(NBodyEnv::Functions::getGravFunc(), 1.0);
 
   NBodyEnv::Particle particleOne(NBodyEnv::gravitational, {0.0, 0.0, 0.0},

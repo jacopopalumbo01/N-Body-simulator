@@ -14,10 +14,10 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 set(HEADER_FILES
-    ../../src/Particle/Particle.hpp
-    ../../src/System/System.hpp
-    ../../src/ParallelSystem/ParallelSystem.hpp
-    ../../src/Functions/Functions.hpp
+    ../../inc/Particle/Particle.hpp
+    ../../inc/System/System.hpp
+    ../../inc/ParallelSystem/ParallelSystem.hpp
+    ../../inc/Functions/Functions.hpp
     )
 
 add_library(NBodyEnvLibrary

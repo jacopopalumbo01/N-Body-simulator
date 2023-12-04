@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../../src/Particle/Particle.hpp"
+#include "../../inc/Particle/Particle.hpp"
 
 int main() {
   NBodyEnv::Particle testParticle(NBodyEnv::gravitational, 1e10,

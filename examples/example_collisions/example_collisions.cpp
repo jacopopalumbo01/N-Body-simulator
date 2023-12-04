@@ -1,8 +1,8 @@
-#include "../../src/Exporter/Exporter.hpp"
-#include "../../src/Functions/Functions.hpp"
-#include "../../src/Particle/Particle.hpp"
-#include "../../src/System/System.hpp"
-#include "../../src/Collisions/Collisions.hpp"
+#include "../../inc/Exporter/Exporter.hpp"
+#include "../../inc/Functions/Functions.hpp"
+#include "../../inc/Particle/Particle.hpp"
+#include "../../inc/System/System.hpp"
+#include "../../inc/Collisions/Collisions.hpp"
 #include <iostream>
 
 int main(int argc, char *argv[]) {

@@ -14,11 +14,11 @@ endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 set(HEADER_FILES
-    ../../src/Particle/Particle.hpp
-    ../../src/System/System.hpp
-    ../../src/Functions/Functions.hpp
-    ../../src/Exporter/Exporter.hpp
-    ../../src/Collisions/Collisions.hpp
+    ../../inc/Particle/Particle.hpp
+    ../../inc/System/System.hpp
+    ../../inc/Functions/Functions.hpp
+    ../../inc/Exporter/Exporter.hpp
+    ../../inc/Collisions/Collisions.hpp
     )
 
 add_library(NBodyEnvLibrary
