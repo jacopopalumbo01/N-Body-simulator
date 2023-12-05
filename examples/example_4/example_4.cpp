@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
   testSystem.addParticle(particleTwo);
 
   // Create exporter
-  NBodyEnv::Exporter exporter("test.part", 1.0);
+  NBodyEnv::Exporter exporter("../../../graphics/test.part", 1.0);
 
   for (int i = 0; i < 3600 * 24 * 7; i++) {
     testSystem.compute();
