@@ -1,6 +1,9 @@
-#include "Functions.hpp"
+#include "../../inc/Functions/Functions.hpp"
+#include "../../inc/Collisions/Collisions.hpp"
+#include <iostream>
 #include <math.h>
 #include <iostream>
+#include <omp.h>
 
 namespace NBodyEnv {
 void Functions::getGrav(Particle &p1, Particle &p2) {
@@ -17,8 +20,43 @@ void Functions::getGrav(Particle &p1, Particle &p2) {
 
   // Detect collision
   if (distance <= p1.getRadius() + p2.getRadius()) {
+    // NBodyEnv::Collisions::getInelasticCollision()(p1, p2);
     return;
   }
+
+  // check for boundary conditions
+  // if a particle goes out of the domain, it will simulate an elastic collision
+  // ==> just need to invert the velocity component along the axis where the
+  // particle has gone out of the domain
+  // TODO: move this somewhere else, since the new velocity values are gonna be
+  // overwritten by the System::compute() function when it calls
+  // iter->updateVel(_deltaTime) if(p1.getPos().xPos > 1.0 || p1.getPos().xPos <
+  // -1.0)
+  // {
+  //   p1.setVel({-p1.getVel().xVel, p1.getVel().yVel, p1.getVel().zVel});
+  // }
+  // else if (p1.getPos().yPos > 1.0 || p1.getPos().yPos < -1.0)
+  // {
+  //   p1.setVel({p1.getVel().xVel, -p1.getVel().yVel, p1.getVel().zVel});
+  // }
+  // else if (p1.getPos().zPos > 1.0 || p1.getPos().zPos < -1.0)
+  // {
+  //   p1.setVel({p1.getVel().xVel, p1.getVel().yVel, -p1.getVel().zVel});
+  // }
+
+  // // same for p2
+  // if(p2.getPos().xPos > 1.0 || p2.getPos().xPos < -1.0)
+  // {
+  //   p2.setVel({-p2.getVel().xVel, p2.getVel().yVel, p2.getVel().zVel});
+  // }
+  // else if (p2.getPos().yPos > 1.0 || p2.getPos().yPos < -1.0)
+  // {
+  //   p2.setVel({p2.getVel().xVel, -p2.getVel().yVel, p2.getVel().zVel});
+  // }
+  // else if (p2.getPos().zPos > 1.0 || p2.getPos().zPos < -1.0)
+  // {
+  //   p2.setVel({p2.getVel().xVel, p2.getVel().yVel, -p2.getVel().zVel});
+  // }
 
   // Calculate mass product
   double totMass = p1.getSpecInfo() * p2.getSpecInfo();
@@ -30,9 +68,12 @@ void Functions::getGrav(Particle &p1, Particle &p2) {
   dummyForce.zForce = (-G * totMass / distanceCubed) * zDistance;
 
   // Modify particles
-  p1.addForce(dummyForce);
-  dummyForce.invert();
-  p2.addForce(dummyForce);
+  // #pragma omp critical(add_force)
+  {
+    p1.addForce(dummyForce);
+    dummyForce.invert();
+    p2.addForce(dummyForce);
+  }
 }
 
 void Functions::getGravVerlet(ParticleVerlet &p1, ParticleVerlet &p2) {

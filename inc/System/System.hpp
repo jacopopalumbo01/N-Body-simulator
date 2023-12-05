@@ -27,6 +27,10 @@ public:
   const std::vector<ParticleVerlet> &getParticlesVerlet() const { return _systemVerlet; }
 
 protected:
+  const std::vector<Particle> &getPrevState() const { return _prevState; }
+  const std::vector<ParticleVerlet> &getPrevStateVerlet() const { return _prevStateVerlet; }
+  std::vector<NBodyEnv::Particle> _prevState;
+  std::vector<NBodyEnv::ParticleVerlet> _prevStateVerlet;
   std::vector<NBodyEnv::Particle> _systemParticles;
   std::vector<NBodyEnv::ParticleVerlet> _systemVerlet;
   std::function<void(Particle &, Particle &)> _func;

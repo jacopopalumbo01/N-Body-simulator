@@ -1,8 +1,9 @@
-#include "System.hpp"
+#include "../../inc/System/System.hpp"
 
 namespace NBodyEnv {
 void System::addParticle(Particle particle) {
   _systemParticles.push_back(particle);
+  _prevState.push_back(particle);
 }
 
 void System::addParticle(ParticleVerlet particleVerlet) {
@@ -18,6 +19,8 @@ const ParticleVerlet &System::getParticleVerlet(int index) const {
 }
 
 void System::compute() {
+  // Save current state in a temp vector
+  std::vector<NBodyEnv::Particle> tempState(_systemParticles);
 
   // Reset forces
   for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
@@ -41,6 +44,10 @@ void System::compute() {
     // Update velocity
     iter->updateVel(_deltaTime);
   }
+
+  // Update prev state
+  _prevState.clear();
+  std::copy(tempState.begin(), tempState.end(), _prevState.begin());
 }
 
 void System::computeVerlet(){

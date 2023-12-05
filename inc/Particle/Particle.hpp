@@ -1,8 +1,9 @@
 #ifndef PARTICLE
-
 #define PARTICLE
 
 #include <functional>
+#include <omp.h>
+
 namespace NBodyEnv {
 
 // Defines the type of particle
@@ -12,6 +13,7 @@ struct Pos {
   double xPos;
   double yPos;
   double zPos;
+  double getDistance(Pos pos);
 };
 
 struct Vel {
@@ -26,9 +28,15 @@ struct Force {
   double zForce;
   // Invert force
   void invert() {
-    xForce = -xForce;
-    yForce = -yForce;
-    zForce = -zForce;
+// xForce = -xForce;
+// yForce = -yForce;
+// zForce = -zForce;
+#pragma omp atomic
+    xForce -= 2 * xForce;
+#pragma omp atomic
+    yForce -= 2 * yForce;
+#pragma omp atomic
+    zForce -= 2 * zForce;
   }
 };
 
@@ -50,6 +58,8 @@ public:
   // SETTERS
   void setPos(Pos pos) { _pos = pos; }
   void setVel(Vel vel) { _vel = vel; }
+  void setRadius(double radius) { _radius = radius; }
+  void setSpecInfo(double specInfo) { _specInfo = specInfo; }
   void setForce(Force force) { _force = force; }
 
   // Compute the force between Particle and another particle. The std::function
@@ -61,8 +71,11 @@ public:
 
   // Add new force contribution
   void addForce(const Force &force) {
+#pragma omp atomic
     _force.xForce += force.xForce;
+#pragma omp atomic
     _force.yForce += force.yForce;
+#pragma omp atomic
     _force.zForce += force.zForce;
   }
 

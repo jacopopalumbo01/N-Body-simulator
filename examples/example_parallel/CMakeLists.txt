@@ -16,24 +16,36 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 set(HEADER_FILES
     ../../inc/Particle/Particle.hpp
     ../../inc/System/System.hpp
+    ../../inc/ParallelSystem/ParallelSystem.hpp
     ../../inc/Functions/Functions.hpp
-    ../../inc/Exporter/Exporter.hpp
-    ../../inc/Particle/ParticleVerlet.hpp
     )
 
 add_library(NBodyEnvLibrary
 ../../src/Particle/Particle.cpp
 ../../src/System/System.cpp
+../../src/ParallelSystem/ParallelSystem.cpp
 ../../src/Functions/Functions.cpp
 ../../src/Exporter/Exporter.cpp
-../../src/Particle/ParticleVerlet.cpp
 )
 
 add_executable(Example
-    ../example_5/example_5.cpp
+    ../example_parallel/example_parallel.cpp
     ${HEADER_FILES}
-)
+    )
 
-target_link_libraries(Example NBodyEnvLibrary)
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(Example PUBLIC OpenMP::OpenMP_CXX NBodyEnvLibrary)
+    target_link_libraries(NBodyEnvLibrary PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
+# # add import library for OpenMP
+# find_package(OpenMP REQUIRED)
+
+#     # add OpenMP flags
+# target_compile_options(Example PRIVATE ${OpenMP_CXX_FLAGS})
+
+
+
 
 

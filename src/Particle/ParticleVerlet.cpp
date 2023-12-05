@@ -1,4 +1,4 @@
-#include "ParticleVerlet.hpp"
+#include "../../inc/Particle/ParticleVerlet.hpp"
 #include <iostream>
 
 namespace NBodyEnv {

@@ -15,7 +15,7 @@ message(STATUS)
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS)
 
-set(HEADER_FILES ../../src/Particle/Particle.hpp)
+set(HEADER_FILES ../../inc/Particle/Particle.hpp)
 
 add_executable(Example
     ../example_1/example_1.cpp

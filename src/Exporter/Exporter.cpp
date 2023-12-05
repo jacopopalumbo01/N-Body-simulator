@@ -1,4 +1,4 @@
-#include "Exporter.hpp"
+#include "../../inc/Exporter/Exporter.hpp"
 #include <vector>
 
 namespace NBodyEnv {

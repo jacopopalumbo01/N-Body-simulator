@@ -18,7 +18,7 @@ set(HEADER_FILES
     ../../inc/System/System.hpp
     ../../inc/Functions/Functions.hpp
     ../../inc/Exporter/Exporter.hpp
-    ../../inc/Particle/ParticleVerlet.hpp
+    ../../inc/Collisions/Collisions.hpp
     )
 
 add_library(NBodyEnvLibrary
@@ -26,11 +26,11 @@ add_library(NBodyEnvLibrary
 ../../src/System/System.cpp
 ../../src/Functions/Functions.cpp
 ../../src/Exporter/Exporter.cpp
-../../src/Particle/ParticleVerlet.cpp
+../../src/Collisions/Collisions.cpp
 )
 
 add_executable(Example
-    ../example_5/example_5.cpp
+    ../example_collisions/example_collisions.cpp
     ${HEADER_FILES}
 )
 
