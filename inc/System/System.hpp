@@ -16,8 +16,10 @@ public:
   void addParticle(Particle particle);
   const Particle &getParticle(int index) const;
   const std::vector<Particle> &getParticles() const { return _systemParticles; }
+  const std::vector<Particle> &getPrevState() const { return _prevState; }
 
 private:
+  std::vector<NBodyEnv::Particle> _prevState;
   std::vector<NBodyEnv::Particle> _systemParticles;
   std::function<void(Particle &, Particle &)> _func;
   double _deltaTime;
