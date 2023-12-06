@@ -98,7 +98,7 @@ public:
 
   ~Particle() = default;
 
-private:
+protected:
   ParticleType _type;
   Pos _pos;
   Vel _vel;

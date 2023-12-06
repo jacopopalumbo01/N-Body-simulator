@@ -11,7 +11,7 @@ import ast
 with open('prova_out.txt') as f:
     input_string = f.readlines()
 
-N = 48
+N = 168
 N_part = 2
 
 input_string = input_string[0]

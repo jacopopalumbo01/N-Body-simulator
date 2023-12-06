@@ -1,0 +1,3 @@
+# EXAMPLE 5
+
+In this example we use a different method to discretize in time. Instead of the Euler method, used so far, a Verlet Integrator is implemented. Using the graphic tools such as the parser and the viewer we notice that from a visual point of view not much changes, but looking at the difference over time (comparison.py, the example4 execution is also needed) we notice some differences in the results.
