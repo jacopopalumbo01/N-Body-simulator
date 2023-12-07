@@ -9,11 +9,6 @@ namespace NBodyEnv
     // print collision position
     std::cout << "Elastic collision at: " << p1.getPos().xPos << ", "
               << p1.getPos().yPos << ", " << p1.getPos().zPos << std::endl;
-    // print particles velocities
-    // std::cout << "P1 velocity: " << p1.getVel().xVel << ", " <<
-    // p1.getVel().yVel << ", " << p1.getVel().zVel << std::endl; std::cout << "P2
-    // velocity: " << p2.getVel().xVel << ", " << p2.getVel().yVel << ", " <<
-    // p2.getVel().zVel << std::endl;
 
     // need to compute the new velocities of the particles
     double totMass = p1.getSpecInfo() + p2.getSpecInfo();
@@ -41,14 +36,7 @@ namespace NBodyEnv
     // set new velocities
     p1.setVel({xVelP1, yVelP1, zVelP1});
     p2.setVel({xVelP2, yVelP2, zVelP2});
-
-    // print new velocities
-    // std::cout << "P1 velocity: " << p1.getVel().xVel << ", " <<
-    // p1.getVel().yVel << ", " << p1.getVel().zVel << std::endl; std::cout << "P2
-    // velocity: " << p2.getVel().xVel << ", " << p2.getVel().yVel << ", " <<
-    // p2.getVel().zVel << std::endl;
   }
-
 
   void Collisions::inelasticCollision(Particle &p1, Particle &p2)
   {

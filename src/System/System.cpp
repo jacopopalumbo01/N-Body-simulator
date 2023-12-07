@@ -44,8 +44,6 @@ namespace NBodyEnv
       {
         // particle is not visible, it has previously been absorbed by another particle
         // ==> skip it
-        // std::cout << "Particle in position: " << iter->getPos().xPos << ", "
-        //           << iter->getPos().yPos << ", " << iter->getPos().zPos << " has been absorbed" << std::endl;
         continue;
       }
       for (auto secIter = iter + 1; secIter != _systemParticles.end();
@@ -56,10 +54,6 @@ namespace NBodyEnv
         iter->computeForce(*secIter, _func);
         if (secIter->getVisible() == false)
           isP2Visible = false;
-      }
-      if(!isP2Visible) {
-        // print iter velocity
-        // std::cout << "p1 velocity after collision: " << iter->getVel().xVel << ", " << iter->getVel().yVel << ", " << iter->getVel().zVel << std::endl;
       }
 
       // Update position
@@ -74,6 +68,7 @@ namespace NBodyEnv
     std::copy(tempState.begin(), tempState.end(), _prevState.begin());
   }
 
+  // TODO: include collisions as done in the method above
   void System::computeVerlet()
   {
     for (auto iter = _systemVerlet.begin(); iter != _systemVerlet.end();
