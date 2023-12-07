@@ -11,6 +11,13 @@ void Functions::getGrav(Particle &p1, Particle &p2) {
   // Dummy force
   Force dummyForce{0.0, 0.0, 0.0};
 
+  if(p2.getVisible() == false) 
+  {
+    // p2 is invisible ==> don't compute the force between the two
+    // don't do any computation, since the force is zero and the velocity should stay constant
+    return;
+  }
+
   // Calculate distance between p1 and p2
   double xDistance = p1.getPos().xPos - p2.getPos().xPos;
   double yDistance = p1.getPos().yPos - p2.getPos().yPos;
@@ -20,7 +27,7 @@ void Functions::getGrav(Particle &p1, Particle &p2) {
 
   // Detect collision
   if (distance <= p1.getRadius() + p2.getRadius()) {
-    // NBodyEnv::Collisions::getInelasticCollision()(p1, p2);
+    NBodyEnv::Collisions::getInelasticCollision()(p1, p2);
     return;
   }
 
@@ -67,13 +74,10 @@ void Functions::getGrav(Particle &p1, Particle &p2) {
   dummyForce.yForce = (-G * totMass / distanceCubed) * yDistance;
   dummyForce.zForce = (-G * totMass / distanceCubed) * zDistance;
 
-  // Modify particles
-  // #pragma omp critical(add_force)
-  {
+  // add force contributions to both particles, invert it for the second one
     p1.addForce(dummyForce);
     dummyForce.invert();
     p2.addForce(dummyForce);
-  }
 }
 
 void Functions::getGravVerlet(ParticleVerlet &p1, ParticleVerlet &p2) {

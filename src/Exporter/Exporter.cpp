@@ -16,8 +16,8 @@ void Exporter::saveState(std::vector<Particle> particles) {
              << part->getPos().yPos << " " << part->getPos().zPos << "\n";
     //     << " Force: " << part->getForce().xForce << " "
     //     << part->getForce().yForce << " " << part->getForce().zForce
-    //     << " Vel: " << part->getVel().xVel << " " << part->getVel().yVel
-    //     << " " << part->getVel().zVel << "\n";
+      _expFile  << " Vel: " << part->getVel().xVel << " " << part->getVel().yVel
+        << " " << part->getVel().zVel << "\n";
   }
 
   // Increase index
