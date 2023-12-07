@@ -49,6 +49,7 @@ namespace NBodyEnv
     // p2.getVel().zVel << std::endl;
   }
 
+
   void Collisions::inelasticCollision(Particle &p1, Particle &p2)
   {
     // NOTE: here we consider a PERFECTLY INELASTIC COLLISION, so the two
