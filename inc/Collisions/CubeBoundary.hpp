@@ -3,16 +3,25 @@
 
 #include "../Particle/Particle.hpp"
 #include "Boundary.hpp"
+#include <vector>
 
 namespace NBodyEnv {
 class CubeBoundary : virtual Boundary {
 public:
-  CubeBoundary() = default;
+  CubeBoundary(double xOne, double xTwo, double yOne, double yTwo, double zOne,
+               double zTwo) {
+    planes.push_back(xOne);
+    planes.push_back(xTwo);
+    planes.push_back(yOne);
+    planes.push_back(yTwo);
+    planes.push_back(zOne);
+    planes.push_back(zTwo);
+  }
   void checkDomain(Particle &particle);
   ~CubeBoundary() = default;
 
 private:
-  double x, y, z;
+  std::vector<double> planes;
 };
 } // namespace NBodyEnv
 
