@@ -109,8 +109,30 @@ namespace NBodyEnv
               _vel.zVel + _force.zForce * deltaTime / _specInfo});
     }
 
+<<<<<<< Updated upstream
     // Print particle infos
     void print() const;
+=======
+  // Invert all x
+  void invertX() {
+    _force.xForce = -_force.xForce;
+    _vel.xVel = -_vel.xVel;
+  }
+
+  // Invert all y
+  void invertY() {
+    _force.yForce = -_force.yForce;
+    _vel.xVel = -_vel.xVel;
+  }
+
+  // Invert all z
+  void invertZ() {
+    _force.zForce = -_force.zForce;
+    _vel.zVel = -_vel.zVel;
+  }
+  // Print particle infos
+  void print() const;
+>>>>>>> Stashed changes
 
     ~Particle() = default;
 
