@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 
+// class used to create an object that writes to a file the particle positions
+// over time, in order to be able to visualize the simulation 
 namespace NBodyEnv {
 class Exporter {
 public:
