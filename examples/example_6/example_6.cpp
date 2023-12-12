@@ -1,6 +1,7 @@
 #include "../../inc/Exporter/Exporter.hpp"
 #include "../../inc/Functions/Functions.hpp"
 #include "../../inc/Functions/EulerDiscretizer.hpp"
+#include "../../inc/Functions/VerletDiscretizer.hpp"
 #include "../../inc/Particle/Particle.hpp"
 #include "../../inc/System/System.hpp"
 #include <iostream>

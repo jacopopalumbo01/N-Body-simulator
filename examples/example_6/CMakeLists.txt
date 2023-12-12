@@ -18,6 +18,7 @@ set(HEADER_FILES
     ../../inc/System/System.hpp
     ../../inc/Functions/Functions.hpp
     ../../inc/Functions/EulerDiscretizer.hpp
+    ../../inc/Functions/VerletDiscretizer.hpp
     ../../inc/Exporter/Exporter.hpp
     ../../inc/Particle/ParticleVerlet.hpp
     )
@@ -27,6 +28,7 @@ add_library(NBodyEnvLibrary
 ../../src/System/System.cpp
 ../../src/Functions/Functions.cpp
 ../../src/Functions/EulerDiscretizer.cpp
+../../src/Functions/VerletDiscretizer.cpp
 ../../src/Exporter/Exporter.cpp
 ../../src/Particle/ParticleVerlet.cpp
 )

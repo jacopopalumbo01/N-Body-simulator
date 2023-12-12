@@ -68,10 +68,6 @@ public:
     func(*this, p2);
   }
 
-  void discretize(Particle &p, const std::function<void(Particle &, double)> &disc, double deltaTime){
-    disc(*this, deltaTime);
-  }
-
   // Add new force contribution
   void addForce(const Force &force) {
 #pragma omp atomic
