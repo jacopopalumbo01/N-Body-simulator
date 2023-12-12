@@ -31,7 +31,7 @@ namespace NBodyEnv
     if (distance <= p1.getRadius() + p2.getRadius())
     {
       // two particles have collided, compute perfectly inelastic collision which results in the merging of the two particles
-      NBodyEnv::Collisions::getInelasticCollision()(p1, p2);
+      // NBodyEnv::Collisions::getInelasticCollision()(p1, p2);
       return;
     }
 

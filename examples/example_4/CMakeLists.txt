@@ -19,6 +19,7 @@ set(HEADER_FILES
     ../../inc/Functions/Functions.hpp
     ../../inc/Exporter/Exporter.hpp
     ../../inc/Collisions/SphereBoundary.hpp
+    ../../inc/Collisions/Collisions.hpp
     )
 
 add_library(NBodyEnvLibrary
@@ -27,6 +28,7 @@ add_library(NBodyEnvLibrary
 ../../src/Functions/Functions.cpp
 ../../src/Exporter/Exporter.cpp
 ../../src/Collisions/SphereBoundary.cpp
+../../src/Collisions/Collisions.cpp
 )
 
 add_executable(Example
