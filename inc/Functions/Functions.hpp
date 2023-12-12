@@ -17,10 +17,6 @@ namespace NBodyEnv
     {
       return getGrav;
     }
-    static void getGravVerlet(ParticleVerlet &p1, ParticleVerlet &p2);
-    static std::function<void(ParticleVerlet &, ParticleVerlet &)> getGravFuncVerlet() {
-    return getGravVerlet;
-  }
   };
 } // namespace NBodyEnv
 

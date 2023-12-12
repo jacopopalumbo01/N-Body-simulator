@@ -6,6 +6,7 @@
 #include <omp.h>
 
 namespace NBodyEnv {
+
 void Functions::getGrav(Particle &p1, Particle &p2) {
 
   // Dummy force
@@ -76,7 +77,10 @@ void Functions::getGrav(Particle &p1, Particle &p2) {
   }
 }
 
-void Functions::getGravVerlet(ParticleVerlet &p1, ParticleVerlet &p2) {
+/*
+
+template<>
+void Functions<ParticleVerlet>::getGrav(ParticleVerlet &p1, ParticleVerlet &p2) {
 
   // Dummy force
   Force dummyForce{0.0, 0.0, 0.0};
@@ -107,4 +111,6 @@ void Functions::getGravVerlet(ParticleVerlet &p1, ParticleVerlet &p2) {
   dummyForce.invert();
   p2.addForce(dummyForce);
 }
+
+*/
 } // namespace NBodyEnv

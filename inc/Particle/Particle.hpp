@@ -40,7 +40,6 @@ struct Force {
   }
 };
 
-// ABSTRACT CLASS for generic particle
 class Particle {
 public:
   Particle(ParticleType type, Pos pos, Vel vel, double specInfo, double radius)
@@ -67,6 +66,10 @@ public:
   void computeForce(Particle &p2,
                     const std::function<void(Particle &, Particle &)> &func) {
     func(*this, p2);
+  }
+
+  void discretize(Particle &p, const std::function<void(Particle &, double)> &disc, double deltaTime){
+    disc(*this, deltaTime);
   }
 
   // Add new force contribution

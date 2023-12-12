@@ -1,24 +1,21 @@
 #include "../../inc/System/System.hpp"
+#include "../../inc/Functions/EulerDiscretizer.hpp"
 
 namespace NBodyEnv {
-void System::addParticle(Particle particle) {
+
+template<>
+void System<EulerDiscretizer>::addParticle(Particle particle) {
   _systemParticles.push_back(particle);
   _prevState.push_back(particle);
 }
 
-void System::addParticle(ParticleVerlet particleVerlet) {
-  _systemVerlet.push_back(particleVerlet);
-}
-
-const Particle &System::getParticle(int index) const {
+template<>
+const Particle &System<EulerDiscretizer>::getParticle(int index) const {
   return _systemParticles[index];
 }
 
-const ParticleVerlet &System::getParticleVerlet(int index) const {
-  return _systemVerlet[index];
-}
-
-void System::compute() {
+template<>
+void System<EulerDiscretizer>::compute() {
   // Save current state in a temp vector
   std::vector<NBodyEnv::Particle> tempState(_systemParticles);
 
@@ -38,11 +35,7 @@ void System::compute() {
       iter->computeForce(*secIter, _func);
     }
 
-    // Update position
-    iter->updatePos(_deltaTime);
-
-    // Update velocity
-    iter->updateVel(_deltaTime);
+    iter->discretize(*iter, _discretizer.discretize, _deltaTime);
   }
 
   // Update prev state
@@ -50,41 +43,9 @@ void System::compute() {
   std::copy(tempState.begin(), tempState.end(), _prevState.begin());
 }
 
-void System::computeVerlet(){
-  for (auto iter = _systemVerlet.begin(); iter != _systemVerlet.end();
-       iter++) {
-    iter->setForce({0.0, 0.0, 0.0});
-  }
-
-  // Compute system forces
-  for (auto iter = _systemVerlet.begin(); iter != _systemVerlet.end();
-       iter++) {
-
-    for (auto secIter = iter + 1; secIter != _systemVerlet.end();
-         secIter++) {
-      // Compute new force
-      iter->computeForce(*secIter, _funcVerlet);
-    }
-
-    iter->updateAcc();
-
-    if(iter->getPrevPart().xPos==0 && iter->getPrevPart().yPos==0 && iter->getPrevPart().zPos==0){
-      iter->updateFirstPos(_deltaTime);
-    }
-    else{
-      iter->updatePos(_deltaTime);
-    }
-  }
-}
-
-void System::printParticles() const{
+template<>
+void System<EulerDiscretizer>::printParticles() const{
   for(auto iter=_systemParticles.begin(); iter != _systemParticles.end(); iter++){
-    std::cout << "Particle number " << iter.base() << " in the system" << std::endl;
-  }  
-}
-
-void System::printParticlesVerlet() const{
-  for(auto iter=_systemVerlet.begin(); iter != _systemVerlet.end(); iter++){
     std::cout << "Particle number " << iter.base() << " in the system" << std::endl;
   }  
 }
