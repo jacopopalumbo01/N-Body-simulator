@@ -2,13 +2,10 @@
 #define EXPORTER
 
 #include "../Particle/Particle.hpp"
-#include "../Particle/ParticleVerlet.hpp"
 #include <fstream>
 #include <iostream>
 #include <vector>
 
-// class used to create an object that writes to a file the particle positions
-// over time, in order to be able to visualize the simulation 
 namespace NBodyEnv {
 class Exporter {
 public:
@@ -18,7 +15,6 @@ public:
     _expFile.open(path);
   }
   void saveState(std::vector<NBodyEnv::Particle>);
-  void saveState(std::vector<NBodyEnv::ParticleVerlet>);
   void close() { _expFile.close(); }
 
 private:
