@@ -40,12 +40,11 @@ struct Force {
   }
 };
 
-// ABSTRACT CLASS for generic particle
 class Particle {
 public:
   Particle(ParticleType type, Pos pos, Vel vel, double specInfo, double radius)
       : _type(type), _pos(pos), _vel(vel), _force({0, 0, 0}),
-        _specInfo(specInfo), _radius(radius), _visible(true){};
+        _specInfo(specInfo), _radius(radius){};
 
   // GETTERS
   const Pos &getPos() const { return _pos; }
@@ -54,7 +53,6 @@ public:
   const double &getRadius() const { return _radius; }
   const ParticleType &getType() const { return _type; }
   const double &getSpecInfo() const { return _specInfo; }
-  const bool &getVisible() const { return _visible; }
 
   // SETTERS
   void setPos(Pos pos) { _pos = pos; }
@@ -62,7 +60,6 @@ public:
   void setRadius(double radius) { _radius = radius; }
   void setSpecInfo(double specInfo) { _specInfo = specInfo; }
   void setForce(Force force) { _force = force; }
-  void setVisible(bool visible) { _visible = visible; }
 
   // Compute the force between Particle and another particle. The std::function
   // func modifies forcess of both particles.
@@ -98,24 +95,6 @@ public:
   // Print particle infos
   void print() const;
 
-  // Invert all x
-  void invertX() {
-    _force.xForce = -_force.xForce;
-    _vel.xVel = -_vel.xVel;
-  }
-
-  // Invert all y
-  void invertY() {
-    _force.yForce = -_force.yForce;
-    _vel.xVel = -_vel.xVel;
-  }
-
-  // Invert all z
-  void invertZ() {
-    _force.zForce = -_force.zForce;
-    _vel.zVel = -_vel.zVel;
-  }
-
   ~Particle() = default;
 
 protected:
@@ -125,11 +104,6 @@ protected:
   Force _force;
   double _specInfo;
   double _radius;
-  // boolean flag to check if particle had a previous collision
-  // if false, it will be ignored in the following calculations
-  // and will be teleported outside of the domain so that it doesn't appear in
-  // the plot
-  bool _visible;
 };
 } // namespace NBodyEnv
 
