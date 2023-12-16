@@ -2,7 +2,6 @@
 #define SYSTEM
 
 #include "../Particle/Particle.hpp"
-#include "../Particle/ParticleVerlet.hpp"
 #include <functional>
 #include <iostream>
 #include <vector>

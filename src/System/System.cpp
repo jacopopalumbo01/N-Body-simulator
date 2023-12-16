@@ -37,21 +37,27 @@ void System<EulerDiscretizer>::compute() {
 
   // Compute system forces
   for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
-       iter++) {
-
-    for (auto secIter = iter + 1; secIter != _systemParticles.end();
-         secIter++) {
-      // Compute new force
-      iter->computeForce(*secIter, _func);
+        iter++)
+  {
+    bool isP2Visible = true;
+    if (!iter->getVisible())
+    {
+      // particle is not visible, it has previously been absorbed by another particle
+      // ==> skip it
+      continue;
     }
-    _discretizer.discretize(*iter, _deltaTime);
+    for (auto secIter = iter + 1; secIter != _systemParticles.end();
+          secIter++)
+    {
+      // here we still need to call computeForce() on the particle p2, even if it is not visible
+      // otherwise we won't update p1
+      iter->computeForce(*secIter, _func);
+      if (secIter->getVisible() == false)
+        isP2Visible = false;
+    }
+  _discretizer.discretize(*iter, _deltaTime);
   }
-
-  // Update prev state
-  _prevState.clear();
-  std::copy(tempState.begin(), tempState.end(), _prevState.begin());
 }
-
 
 template<>
 void System<VerletDiscretizer>::addParticle(Particle particle) {
@@ -70,6 +76,8 @@ void System<VerletDiscretizer>::printParticles() const{
     std::cout << "Particle number " << iter.base() << " in the system" << std::endl;
   }  
 }
+
+//TODO the same as above for the collisions
 
 template<>
 void System<VerletDiscretizer>::compute() {

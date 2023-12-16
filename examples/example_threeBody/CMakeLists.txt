@@ -18,7 +18,6 @@ set(HEADER_FILES
     ../../inc/System/System.hpp
     ../../inc/Functions/Functions.hpp
     ../../inc/Exporter/Exporter.hpp
-    ../../inc/Collisions/SphereBoundary.hpp
     ../../inc/Collisions/Collisions.hpp
     )
 
@@ -27,15 +26,20 @@ add_library(NBodyEnvLibrary
 ../../src/System/System.cpp
 ../../src/Functions/Functions.cpp
 ../../src/Exporter/Exporter.cpp
-../../src/Collisions/SphereBoundary.cpp
 ../../src/Collisions/Collisions.cpp
 )
 
 add_executable(Example
-    ../example_4/example_4.cpp
+    ../example_threeBody/example_SunEarthMoon.cpp
+    ${HEADER_FILES}
+)
+
+add_executable(ThreeBodySim
+    ../example_threeBody/example_threeBody.cpp
     ${HEADER_FILES}
 )
 
 target_link_libraries(Example NBodyEnvLibrary)
+target_link_libraries(ThreeBodySim NBodyEnvLibrary)
 
 
