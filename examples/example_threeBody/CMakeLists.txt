@@ -19,6 +19,8 @@ set(HEADER_FILES
     ../../inc/Functions/Functions.hpp
     ../../inc/Exporter/Exporter.hpp
     ../../inc/Collisions/Collisions.hpp
+    ../../inc/Functions/EulerDiscretizer.hpp
+    ../../inc/Functions/VerletDiscretizer.hpp
     )
 
 add_library(NBodyEnvLibrary
@@ -27,6 +29,8 @@ add_library(NBodyEnvLibrary
 ../../src/Functions/Functions.cpp
 ../../src/Exporter/Exporter.cpp
 ../../src/Collisions/Collisions.cpp
+../../src/Functions/EulerDiscretizer.cpp
+../../src/Functions/VerletDiscretizer.cpp
 )
 
 add_executable(Example

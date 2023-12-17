@@ -13,13 +13,6 @@ namespace NBodyEnv
     // Dummy force
     Force dummyForce{0.0, 0.0, 0.0};
 
-    if (p2.getVisible() == false)
-    {
-      // p2 is invisible, it has previously collided with another particle ==> don't compute the force between the two
-      // since this particle should no longer be considered
-      return;
-    }
-
     // Calculate distance between p1 and p2
     double xDistance = p1.getPos().xPos - p2.getPos().xPos;
     double yDistance = p1.getPos().yPos - p2.getPos().yPos;
@@ -27,7 +20,7 @@ namespace NBodyEnv
     double distance = sqrt(xDistance * xDistance + yDistance * yDistance +
                            zDistance * zDistance);
 
-    // Detect collision
+    // Detect collision between the two particles
     if (distance <= p1.getRadius() + p2.getRadius())
     {
       // two particles have collided, compute perfectly inelastic collision which results in the merging of the two particles

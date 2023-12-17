@@ -3,6 +3,8 @@
 #include "../../inc/Functions/Functions.hpp"
 #include "../../inc/Particle/Particle.hpp"
 #include "../../inc/System/System.hpp"
+#include "../../inc/Functions/EulerDiscretizer.hpp"
+#include "../../inc/Functions/VerletDiscretizer.hpp"
 #include <iostream>
 
 int main(int argc, char *argv[]) {
@@ -10,7 +12,7 @@ int main(int argc, char *argv[]) {
   // Create a sphere boundary
   NBodyEnv::SphereBoundary boundary({0.0, 0.0, 0.0}, 1e10);
 
-  NBodyEnv::System testSystem(NBodyEnv::Functions::getGravFunc(), 1.0);
+  NBodyEnv::System<NBodyEnv::VerletDiscretizer> testSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1.0);
 
   NBodyEnv::Particle particleOne(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
                                  {5e-3, 0.0, 0.0}, 1.0e10, 50);

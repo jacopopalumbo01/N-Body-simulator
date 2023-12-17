@@ -3,13 +3,15 @@
 #include "../../inc/Particle/Particle.hpp"
 #include "../../inc/System/System.hpp"
 #include "../../inc/Collisions/Collisions.hpp"
+#include "../../inc/Functions/EulerDiscretizer.hpp"
+#include "../../inc/Functions/VerletDiscretizer.hpp"
 #include <iostream>
 
 int main(int argc, char *argv[])
 {
     // create a new ParticleSystem by passing the function which computes the gravitational force
     // and the time step used for the simulation over time
-    NBodyEnv::System testSystem(NBodyEnv::Functions::getGravFunc(), 1.0);
+    NBodyEnv::System<NBodyEnv::VerletDiscretizer> testSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1.0);
 
     // create Sun - Earth - Moon system with real values and simulate it
     NBodyEnv::Particle particleSun(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
@@ -24,7 +26,7 @@ int main(int argc, char *argv[])
     // testSystem.addParticle(particleMoon);
 
     // Create exporter
-    NBodyEnv::Exporter exporter("test.part", 1.0);
+    NBodyEnv::Exporter exporter("../../../graphics/test.part", 1.0);
 
     // simulate over a year time span
     for (int i = 0; i < 3600 * 24 * 7; i++)
