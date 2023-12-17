@@ -43,7 +43,14 @@ add_executable(ThreeBodySim
     ${HEADER_FILES}
 )
 
-target_link_libraries(Example NBodyEnvLibrary)
-target_link_libraries(ThreeBodySim NBodyEnvLibrary)
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(ThreeBodySim PUBLIC OpenMP::OpenMP_CXX NBodyEnvLibrary)
+    target_link_libraries(Example PUBLIC OpenMP::OpenMP_CXX NBodyEnvLibrary)
+    target_link_libraries(NBodyEnvLibrary PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
+# target_link_libraries(Example NBodyEnvLibrary)
+# target_link_libraries(ThreeBodySim NBodyEnvLibrary)
 
 

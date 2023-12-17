@@ -2,6 +2,7 @@
 #include "../../inc/Particle/Particle.hpp"
 #include "../../inc/Functions/EulerDiscretizer.hpp"
 #include "../../inc/Functions/VerletDiscretizer.hpp"
+#include <omp.h>
 
 namespace NBodyEnv
 {
@@ -36,6 +37,9 @@ namespace NBodyEnv
     // Save current state in a temp vector
     std::vector<NBodyEnv::Particle> tempState(_systemParticles);
 
+#if defined(_OPENMP)
+#pragma omp for
+#endif
     // Reset forces
     for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
          iter++)
@@ -46,41 +50,43 @@ namespace NBodyEnv
     // boolean flag to make sure particle is updated in case all others have been absorbed
     bool updated = false;
 
-    // Compute system forces
-    for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
-         iter++)
+#if defined(_OPENMP)
+#pragma omp for
+#endif
+    for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
     {
-      if (!iter->getVisible())
-      {
-        // particle is not visible, it has previously been absorbed by another particle
-        // ==> skip it
+      if (!_systemParticles[i].getVisible())
         continue;
-      }
-      // reset the updated flag
       updated = false;
 
-      for (auto secIter = iter + 1; secIter != _systemParticles.end();
-           secIter++)
+      for (long unsigned int j = i + 1; j < _systemParticles.size(); ++j)
       {
-        // if p2 is not visible, don't compute the force between it and p1
-        if (secIter->getVisible() == false)
+        if (!_systemParticles[j].getVisible())
           continue;
-        iter->computeForce(*secIter, _func);
+        _systemParticles[i].computeForce(_systemParticles[j], _func);
         updated = true;
       }
+
       if (!updated)
       {
         // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
         // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
         NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
                                          {0.0, 0.0, 0.0}, 0, 0);
-        iter->computeForce(ghostParticle, _func);
-        // let the user know it's system collapsed into one particle and cut the loop short, no need to update
-        // the position of the other particles since they are not visible
-        std::cout << "Particle " << iter.base() << " has absorbed all other particles" << std::endl;
-        break;
+        _systemParticles[i].computeForce(ghostParticle, _func);
+        // should use a break here, but it's not possible in openmp
+        continue;
       }
-      _discretizer.discretize(*iter, _deltaTime);
+    }
+
+#if defined(_OPENMP)
+#pragma omp for
+#endif
+    // need to decouple the update of the position and velocity from the
+    // computation of the forces, for unknown reasons
+    for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
+    {
+      _discretizer.discretize(_systemParticles[i], _deltaTime);
     }
   }
 
@@ -114,32 +120,63 @@ namespace NBodyEnv
     // Save current state in a temp vector
     std::vector<NBodyEnv::Particle> tempState(_systemParticles);
 
+#if defined(_OPENMP)
+#pragma omp for
+#endif
     // Reset forces
     for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
          iter++)
     {
       iter->setForce({0.0, 0.0, 0.0});
+      // std::cout << "Number of threads: " << omp_get_num_threads() << "\n";
     }
 
-    // Compute system forces
-    for (auto iter = _systemParticles.begin(), prevIter = _prevState.begin(); iter != _systemParticles.end();
-         iter++, prevIter++)
-    {
+    // boolean flag to make sure particle is updated in case all others have been absorbed
+    bool updated = false;
 
-      for (auto secIter = iter + 1; secIter != _systemParticles.end();
-           secIter++)
+#if defined(_OPENMP)
+#pragma omp for
+#endif
+    for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
+    {
+      if (!_systemParticles[i].getVisible())
+        continue;
+      updated = false;
+
+      for (long unsigned int j = i + 1; j < _systemParticles.size(); ++j)
       {
-        // Compute new force
-        iter->computeForce(*secIter, _func);
+        if (!_systemParticles[j].getVisible())
+          continue;
+        _systemParticles[i].computeForce(_systemParticles[j], _func);
+        updated = true;
       }
 
-      if (prevIter->getPos().xPos == 0 && prevIter->getPos().yPos == 0 && prevIter->getPos().zPos == 0)
+      if (!updated)
       {
-        _discretizer.updateFirsePos(*iter, _deltaTime);
+        // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
+        // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
+        NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
+                                         {0.0, 0.0, 0.0}, 0, 0);
+        _systemParticles[i].computeForce(ghostParticle, _func);
+        // should use a break here, but it's not possible in openmp
+        continue;
+      }
+    }
+
+#if defined(_OPENMP)
+#pragma omp for
+#endif
+    // need to decouple the update of the position and velocity from the
+    // computation of the forces, for unknown reasons
+    for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
+    {
+      if (_prevState[i].getPos().xPos == 0 && _prevState[i].getPos().yPos == 0 && _prevState[i].getPos().zPos == 0)
+      {
+        _discretizer.updateFirsePos(_systemParticles[i], _deltaTime);
       }
       else
       {
-        _discretizer.updatePos(*iter, *prevIter, _deltaTime);
+        _discretizer.updatePos(_systemParticles[i], _prevState[i], _deltaTime);
       }
     }
 
