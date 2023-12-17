@@ -40,7 +40,6 @@ struct Force {
   }
 };
 
-// ABSTRACT CLASS for generic particle
 class Particle {
 public:
   Particle(ParticleType type, Pos pos, Vel vel, double specInfo, double radius)
