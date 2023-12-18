@@ -13,36 +13,77 @@ namespace NBodyEnv
     // Dummy force
     Force dummyForce{0.0, 0.0, 0.0};
 
-    if (p2.getVisible() == false)
+    // compute the distance between p1 and p2 in parallel
+    double xDistance, yDistance, zDistance;
+#if defined(_OPENMP)
+#pragma omp parallel sections
+#endif
     {
-      // p2 is invisible, it has previously collided with another particle ==> don't compute the force between the two
-      // since this particle should no longer be considered
-      return;
+#if defined(_OPENMP)
+#pragma omp section
+#endif
+      {
+        xDistance = p1.getPos().xPos - p2.getPos().xPos;
+      }
+#if defined(_OPENMP)
+#pragma omp section
+#endif
+      {
+        yDistance = p1.getPos().yPos - p2.getPos().yPos;
+      }
+#if defined(_OPENMP)
+#pragma omp section
+#endif
+      {
+        zDistance = p1.getPos().zPos - p2.getPos().zPos;
+      }
     }
 
-    // Calculate distance between p1 and p2
-    double xDistance = p1.getPos().xPos - p2.getPos().xPos;
-    double yDistance = p1.getPos().yPos - p2.getPos().yPos;
-    double zDistance = p1.getPos().zPos - p2.getPos().zPos;
+    // double yDistance = p1.getPos().yPos - p2.getPos().yPos;
+    // double zDistance = p1.getPos().zPos - p2.getPos().zPos;
     double distance = sqrt(xDistance * xDistance + yDistance * yDistance +
                            zDistance * zDistance);
 
-    // Detect collision
+    // Detect collision between the two particles
     if (distance <= p1.getRadius() + p2.getRadius())
     {
       // two particles have collided, compute perfectly inelastic collision which results in the merging of the two particles
-      //NBodyEnv::Collisions::getElasticCollision()(p1, p2);
+      // NBodyEnv::Collisions::getElasticCollision()(p1, p2);
       return;
     }
 
     // Calculate mass product
     double totMass = p1.getSpecInfo() * p2.getSpecInfo();
 
-    // Compute contributes along each axis
+    // Compute contributes along each axis in parallel for each component
     double distanceCubed = distance * distance * distance;
-    dummyForce.xForce = (-G * totMass / distanceCubed) * xDistance;
-    dummyForce.yForce = (-G * totMass / distanceCubed) * yDistance;
-    dummyForce.zForce = (-G * totMass / distanceCubed) * zDistance;
+#if defined(_OPENMP)
+#pragma omp parallel sections
+#endif
+    {
+#if defined(_OPENMP)
+#pragma omp section
+#endif
+      {
+        dummyForce.xForce = (-G * totMass / distanceCubed) * xDistance;
+      }
+#if defined(_OPENMP)
+#pragma omp section
+#endif
+      {
+        dummyForce.yForce = (-G * totMass / distanceCubed) * yDistance;
+      }
+#if defined(_OPENMP)
+#pragma omp section
+#endif
+      {
+        dummyForce.zForce = (-G * totMass / distanceCubed) * zDistance;
+      }
+    }
+
+    // dummyForce.xForce = (-G * totMass / distanceCubed) * xDistance;
+    // dummyForce.yForce = (-G * totMass / distanceCubed) * yDistance;
+    // dummyForce.zForce = (-G * totMass / distanceCubed) * zDistance;
 
     // add force contributions to both particles, invert it for the second one
     p1.addForce(dummyForce);

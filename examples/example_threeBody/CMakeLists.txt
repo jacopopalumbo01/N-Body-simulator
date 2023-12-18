@@ -19,6 +19,8 @@ set(HEADER_FILES
     ../../inc/Functions/Functions.hpp
     ../../inc/Exporter/Exporter.hpp
     ../../inc/Collisions/Collisions.hpp
+    ../../inc/Functions/EulerDiscretizer.hpp
+    ../../inc/Functions/VerletDiscretizer.hpp
     )
 
 add_library(NBodyEnvLibrary
@@ -27,6 +29,8 @@ add_library(NBodyEnvLibrary
 ../../src/Functions/Functions.cpp
 ../../src/Exporter/Exporter.cpp
 ../../src/Collisions/Collisions.cpp
+../../src/Functions/EulerDiscretizer.cpp
+../../src/Functions/VerletDiscretizer.cpp
 )
 
 add_executable(Example
@@ -39,7 +43,14 @@ add_executable(ThreeBodySim
     ${HEADER_FILES}
 )
 
-target_link_libraries(Example NBodyEnvLibrary)
-target_link_libraries(ThreeBodySim NBodyEnvLibrary)
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(ThreeBodySim PUBLIC OpenMP::OpenMP_CXX NBodyEnvLibrary)
+    target_link_libraries(Example PUBLIC OpenMP::OpenMP_CXX NBodyEnvLibrary)
+    target_link_libraries(NBodyEnvLibrary PUBLIC OpenMP::OpenMP_CXX)
+endif()
+
+# target_link_libraries(Example NBodyEnvLibrary)
+# target_link_libraries(ThreeBodySim NBodyEnvLibrary)
 
 
