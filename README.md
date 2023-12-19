@@ -44,7 +44,7 @@ This simulator is particularly well-suited for modeling scenarios where objects 
 
 The simulation employs a numerical integration method to solve the gravitational N-body problem. The gravitational force acting on each particle is calculated based on Newton's law of gravitation:
 
-<span style="font-size: large;">$F_{ij} = G\frac{m_i m_j}{r_{ij}^2} \frac{\bold{r_{ij}}}{|\bold{{r_{ij}}|}}$</span>
+<span style="font-size: x-large;">$F_{ij} = G\frac{m_i m_j}{r_{ij}^2} \frac{\mathbf{r_{ij}}}{|{\mathbf{r_{ij}}|}}$</span>
 
 where:
 
@@ -56,7 +56,7 @@ where:
   
 - $r_{ij}$​ is the vector pointing from particle $i$ to particle $j$, and
   
-- $\bold{r_{ij}}​$ is the distance between particles $i$ and $j$.
+- $\mathbf{r_{ij}}​$ is the distance between particles $i$ and $j$.
   
 
 The total force acting on each particle is the sum of the individual forces from all other particles in the simulation.
@@ -90,4 +90,4 @@ To run the simulator, follow these steps:
   
 2. Choose one of the provideed examples, or build one yourself. Bear in mind that not all of examples work due to past major changes in the project structure. You can find further information the dedicated folder.
   
-3. Try the benchmark utilities to test the time required for the code execution. Future implementations will feature an estimation of the algorithm complexity. You can infere the scalability of the program with respect to the number of objects included in the simulation. Further information in the **tests/Benchmark** folder.
+3. Try the benchmark utilities to test the time required for the code execution. Future implementations will feature an estimation of the algorithm complexity. You can infere the scalability of the program with respect to the number of objects included in the simulation. Further information in the **tests/Benchmarks** folder.
