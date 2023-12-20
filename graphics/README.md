@@ -21,9 +21,7 @@ python3 real_parser.py
 ```bash
 python3 viewer.py 
 ```
-5 - check out the .mp4 file generated in the current folder
-
-The result should be something like this: \
+5 - check out the .mp4 file generated in the current folder. The result should be something like this: \
 https://github.com/jacopopalumbo01/N-Body-simulator/assets/118806991/bf40cd90-3133-4917-b55e-af101928cef1
 
 
