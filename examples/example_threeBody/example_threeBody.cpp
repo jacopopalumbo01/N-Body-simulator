@@ -23,22 +23,38 @@ int main(int argc, char *argv[])
     NBodyEnv::Particle particleThree(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
                                      {0.0, 0.0, 0.0}, 1.0e10, 10);
 
-    // NBodyEnv::Particle particleFour(NBodyEnv::gravitational, {1800.0, 100.0, 0.0},
-    //                                        {1.0e-3, -4.0e-3, 0.0}, 1.0e10, 10);
+    NBodyEnv::Particle particleFour(NBodyEnv::gravitational, {1800.0, 100.0, 0.0},
+                                    {1.0e-3, -4.0e-3, 0.0}, 1.0e10, 10);
 
-    // NBodyEnv::Particle particleFive(NBodyEnv::gravitational, {1200.0, -700.0, 0.0},
-    //                                        {-2.0e-3, -1.0e-3, 0.0}, 1.0e10, 10);
+    NBodyEnv::Particle particleFive(NBodyEnv::gravitational, {1200.0, -700.0, 0.0},
+                                    {-2.0e-3, -1.0e-3, 0.0}, 1.0e10, 10);
 
-    // NBodyEnv::Particle particleSix(NBodyEnv::gravitational, {400.0, -900.0, 0.0},
-    //                                        {-6.0e-3, 6.0e-3, 0.0}, 1.0e10, 10);
+    NBodyEnv::Particle particleSix(NBodyEnv::gravitational, {400.0, -900.0, 0.0},
+                                   {-6.0e-3, 6.0e-3, 0.0}, 1.0e10, 10);
+
+    NBodyEnv::Particle particleSeven(NBodyEnv::gravitational, {200.0, 0.0, -300.0},
+                                     {0.0, 0.0, 0.0}, 1.0e10, 10);
+
+    NBodyEnv::Particle particleEight(NBodyEnv::gravitational, {0.0, 400.0, 900.0},
+                                     {0.0, 0.0, 0.0}, 1.0e10, 10);
+
+    NBodyEnv::Particle particleNine(NBodyEnv::gravitational, {-700.0, 0.0, 300.0},
+                                    {0.0, 0.0, 0.0}, 1.0e10, 10);
+
+    NBodyEnv::Particle particleTen(NBodyEnv::gravitational, {200.0, 600.0, -1000.0},
+                                   {0.0, 0.0, 0.0}, 1.0e10, 10);
 
     testSystem.addParticle(particleOne);
     testSystem.addParticle(particleTwo);
     testSystem.addParticle(particleThree);
-    // testSystem.addParticle(particleFour);
-    // testSystem.addParticle(particleFive);
-    // testSystem.addParticle(particleSix);
-
+    testSystem.addParticle(particleFour);
+    testSystem.addParticle(particleFive);
+    testSystem.addParticle(particleSix);
+    testSystem.addParticle(particleSeven);
+    testSystem.addParticle(particleEight);
+    testSystem.addParticle(particleNine);
+    testSystem.addParticle(particleTen);
+    
     // Create exporter
     NBodyEnv::Exporter exporter("../../../graphics/test.part", 1);
 
