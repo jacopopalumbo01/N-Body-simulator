@@ -7,11 +7,11 @@
 #include <vector>
 
 namespace NBodyEnv {
-template<class T>
-class System {
+template <class T> class System {
 public:
-  System(std::function<void(Particle &, Particle &)> func, T discretizer, double deltaTime)
-      : _func(func), _discretizer(discretizer), _deltaTime(deltaTime) {};
+  System(std::function<void(Particle &, Particle &)> func, T discretizer,
+         double deltaTime)
+      : _func(func), _discretizer(discretizer), _deltaTime(deltaTime){};
   ~System() = default;
   void compute();
   void addParticle(Particle particle);
