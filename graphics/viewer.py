@@ -11,8 +11,8 @@ import ast
 with open('prova_out.txt') as f:
     input_string = f.readlines()
 
-N = 168
-N_part = 2
+N = 336
+N_part = 32
 
 input_string = input_string[0]
 
@@ -27,12 +27,12 @@ result_array = np.array(result_list_of_lists)
 
 a = result_array
 
-a[0][0] = 1
-a[0][1] = 1
-a[0][2] = 0
-a[1][0] = -1000
-a[1][1] = -1000
-a[1][2] = 0
+a[0][0] = 10000
+a[0][1] = 10000
+a[0][2] = 10000
+a[1][0] = -10000
+a[1][1] = -10000
+a[1][2] = -10000
 
 print(a)
 
