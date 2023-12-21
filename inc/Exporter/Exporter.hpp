@@ -7,7 +7,7 @@
 #include <vector>
 
 // class used to create an object that writes to a file the particle positions
-// over time, in order to be able to visualize the simulation 
+// over time, in order to be able to visualize the simulation
 namespace NBodyEnv {
 class Exporter {
 public:
@@ -18,6 +18,7 @@ public:
   }
   void saveState(std::vector<NBodyEnv::Particle>);
   void close() { _expFile.close(); }
+  ~Exporter() = default;
 
 private:
   std::ofstream _expFile;
