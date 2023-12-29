@@ -119,7 +119,6 @@ namespace NBodyEnv
   {
     // Save current state in a temp vector
     std::vector<NBodyEnv::Particle> tempState(_systemParticles);
-
 #if defined(_OPENMP)
 #pragma omp for
 #endif
@@ -135,14 +134,13 @@ namespace NBodyEnv
     bool updated = false;
 
 #if defined(_OPENMP)
-#pragma omp for
+#pragma omp for private(updated) schedule(static)
 #endif
     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
     {
       if (!_systemParticles[i].getVisible())
         continue;
       updated = false;
-
       for (long unsigned int j = i + 1; j < _systemParticles.size(); ++j)
       {
         if (!_systemParticles[j].getVisible())
