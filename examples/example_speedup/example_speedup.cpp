@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
     // define the range for particle masses
     std::uniform_real_distribution<> massDistr(1.0e10, 1.0e11);
 
+
     // Create and add test particles
     for (int i = 0; i < numParticles; i++)
     {
@@ -54,23 +55,20 @@ int main(int argc, char *argv[])
     NBodyEnv::Exporter exporter("test.part", 1);
     NBodyEnv::Exporter serialExporter("serialTest.part", 1);
 
+    // set number of threads 
+    omp_set_num_threads(8);
+
     for (int i = 0; i < numSimulations; i++)
     {
         // Get starting timepoint
         auto start = high_resolution_clock::now();
 
-#pragma omp parallel num_threads(8)
+        // simulate over a year time span
+        for (int i = 0; i < 3600 * 24; i++)
         {
-            // simulate over a year time span
-            for (int i = 0; i < 3600 * 24; i++)
-            {
-                parallelSystem.compute();
-                if (i % 3600 == 0)
-// #if defined(_OPENMP)
-#pragma omp master
-                    // // #endif
-                    exporter.saveState(parallelSystem.getParticles());
-            }
+            parallelSystem.compute();
+            if (i % 3600 == 0)
+                exporter.saveState(parallelSystem.getParticles());
         }
 
         auto stop = high_resolution_clock::now();

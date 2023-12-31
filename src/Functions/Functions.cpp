@@ -38,12 +38,12 @@ namespace NBodyEnv
     dummyForce.zForce = (-G * totMass / distanceCubed) * zDistance;
 
     // add force contributions to both particles, invert it for the second one
-    // # pragma omp critical
-    {
-      p1.addForce(dummyForce);
-      dummyForce.invert();
-      p2.addForce(dummyForce);
-    }
+    p1.addForce(dummyForce);
+    // dummyForce.invert();
+    // dummyForce.xForce = -dummyForce.xForce;
+    // dummyForce.yForce = -dummyForce.yForce;
+    // dummyForce.zForce = -dummyForce.zForce;
+    // p2.addForce(dummyForce);
   }
 
 } // namespace NBodyEnv

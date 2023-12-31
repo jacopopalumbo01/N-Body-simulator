@@ -71,8 +71,8 @@ int main(int argc, char *argv[])
     serialSystem.addParticle(particleTen);
 
     // Create exporter
-    // NBodyEnv::Exporter exporter("test.part", 1);
-    // NBodyEnv::Exporter serialExporter("serialTest.part", 1);
+    NBodyEnv::Exporter exporter("test.part", 1);
+    NBodyEnv::Exporter serialExporter("serialTest.part", 1);
 
     // simulate the system many times ==> need this for testing and estimating
     // the speed up of the parallelization with OpenMP
@@ -87,19 +87,17 @@ int main(int argc, char *argv[])
         // Get starting timepoint
         auto start = high_resolution_clock::now();
 
-// #if defined(_OPENMP)
-#pragma omp parallel
-// #endif
+#if defined(_OPENMP)
+#pragma omp parallel num_threads(4)
+        #endif
         {
             // simulate over a year time span
             for (int k = 0; k < 3600 * 24; k++)
             {
                 parallelSystem.compute();
-                //         if (i % 3600 == 0)
-                // #if defined(_OPENMP)
-                // #pragma omp single
-                // #endif
-                //             exporter.saveState(parallelSystem.getParticles());
+                if (k % 3600 == 0)
+#pragma omp master
+                    exporter.saveState(parallelSystem.getParticles());
             }
         }
 
@@ -108,13 +106,13 @@ int main(int argc, char *argv[])
         // Get duration. Substart timepoints to
         // get duration. To cast it to proper unit
         // use duration cast method
-        auto duration = duration_cast<microseconds>(stop - start);
+        auto duration = duration_cast<milliseconds>(stop - start);
         durationsParallel[i] = duration;
 
         std::cout << "Time taken by parallel execution: "
-                  << duration.count() << " microseconds" << std::endl;
+                  << duration.count() << " milliseconds" << std::endl;
 
-        // exporter.close();
+        exporter.close();
 
         start = high_resolution_clock::now();
 
@@ -122,16 +120,18 @@ int main(int argc, char *argv[])
         for (int k = 0; k < 3600 * 24; k++)
         {
             serialSystem.compute();
-            // if (i % 3600 == 0)
-            //     serialExporter.saveState(serialSystem.getParticles());
+            if (k % 3600 == 0)
+                serialExporter.saveState(serialSystem.getParticles());
         }
 
         stop = high_resolution_clock::now();
-        duration = duration_cast<microseconds>(stop - start);
+        duration = duration_cast<milliseconds>(stop - start);
         durationsSerial[i] = duration;
 
         std::cout << "Time taken by serial execution: "
-                  << duration.count() << " microseconds" << std::endl;
+                  << duration.count() << " milliseconds" << std::endl;
+
+        serialExporter.close();
     }
 
     // compute the average speed up of each simulation
@@ -145,14 +145,12 @@ int main(int argc, char *argv[])
         totParallelTime += (double)durationsParallel[k].count();
     }
 
-    // print the average parallel execution time 
+    // print the average parallel execution time
     std::cout << "Average parallel execution time: " << totParallelTime / (double)numSimulations << std::endl;
-    // print the average serial execution time 
+    // print the average serial execution time
     std::cout << "Average serial execution time: " << totSerialTime / (double)numSimulations << std::endl;
 
     std::cout << "Average speed up: " << averageSpeedUp / (double)numSimulations << std::endl;
-
-    // serialExporter.close();
 
     return 0;
 }
