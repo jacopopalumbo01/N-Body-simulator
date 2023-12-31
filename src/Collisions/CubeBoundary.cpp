@@ -1,4 +1,4 @@
-#include "../../inc/Collisions/CubeBoundary.hpp"
+#include "Collisions/CubeBoundary.hpp"
 
 namespace NBodyEnv
 {

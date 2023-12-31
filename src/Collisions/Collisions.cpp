@@ -1,4 +1,4 @@
-#include "../../inc/Collisions/Collisions.hpp"
+#include "Collisions/Collisions.hpp"
 #include <iostream>
 #include <math.h>
 

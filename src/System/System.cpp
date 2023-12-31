@@ -1,7 +1,7 @@
-#include "../../inc/System/System.hpp"
-#include "../../inc/Particle/Particle.hpp"
-#include "../../inc/Functions/EulerDiscretizer.hpp"
-#include "../../inc/Functions/VerletDiscretizer.hpp"
+#include "System/System.hpp"
+#include "Particle/Particle.hpp"
+#include "Functions/EulerDiscretizer.hpp"
+#include "Functions/VerletDiscretizer.hpp"
 #include <omp.h>
 
 namespace NBodyEnv
@@ -172,7 +172,7 @@ namespace NBodyEnv
     // inner loop starts from value i, which depends on the outer loop and is not thread safe
     //
     // #if defined(_OPENMP)
-    // #pragma omp for private(updated) schedule(static)
+    // #pragma omp parallel for private(updated) schedule(static)
     // #endif
     //     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
     //     {
@@ -201,7 +201,6 @@ namespace NBodyEnv
 
 #if defined(_OPENMP)
 #pragma omp parallel for private(updated) schedule(static)
-// #pragma omp for private(updated) schedule(static)
 #endif
     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
     {

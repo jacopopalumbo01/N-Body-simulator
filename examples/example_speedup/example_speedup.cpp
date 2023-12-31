@@ -1,10 +1,10 @@
-#include "../../inc/Exporter/Exporter.hpp"
-#include "../../inc/Functions/Functions.hpp"
-#include "../../inc/Particle/Particle.hpp"
-#include "../../inc/System/System.hpp"
-#include "../../inc/Collisions/Collisions.hpp"
-#include "../../inc/Functions/EulerDiscretizer.hpp"
-#include "../../inc/Functions/VerletDiscretizer.hpp"
+#include "Exporter/Exporter.hpp"
+#include "Functions/Functions.hpp"
+#include "Particle/Particle.hpp"
+#include "System/System.hpp"
+#include "Collisions/Collisions.hpp"
+#include "Functions/EulerDiscretizer.hpp"
+#include "Functions/VerletDiscretizer.hpp"
 #include <iostream>
 #include <random>
 #include <chrono>
@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     NBodyEnv::System<NBodyEnv::VerletDiscretizer> parallelSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
     // NBodyEnv::System<NBodyEnv::VerletDiscretizer> serialSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
 
-    constexpr int numParticles = 1024;
+    constexpr int numParticles = 256;
 
     // obtain a random number from hardware
     std::random_device rand;
@@ -44,19 +44,19 @@ int main(int argc, char *argv[])
 
     // simulate the system many times ==> need this for testing and estimating
     // the speed up of the parallelization with OpenMP
-    constexpr int numSimulations = 10;
+    constexpr int numSimulations = 1;
 
     // array of microseconds type for each simulation
     milliseconds durationsParallel[numSimulations];
     // milliseconds durationsSerial[numSimulations];
 
     // Create exporter
-    // NBodyEnv::Exporter exporter("test.part", 1);
+    NBodyEnv::Exporter exporter("test.part", 1);
     // NBodyEnv::Exporter serialExporter("serialTest.part", 1);
 
 // set number of threads
 #if defined(_OPENMP)
-    omp_set_num_threads(16);
+    omp_set_num_threads(12);
 #endif // _OPENMP
 
     for (int i = 0; i < numSimulations; i++)
@@ -68,8 +68,8 @@ int main(int argc, char *argv[])
         for (int i = 0; i < 3600; i++)
         {
             parallelSystem.compute();
-            // if (i % 3600 == 0)
-            //     exporter.saveState(parallelSystem.getParticles());
+            if (i % 3600 == 0)
+                exporter.saveState(parallelSystem.getParticles());
         }
 
         auto stop = high_resolution_clock::now();
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
         std::cout << "Time taken by sequential execution: "
                   << duration.count() << " milliseconds" << std::endl;
 
-        // exporter.close();
+        exporter.close();
 
         // start = high_resolution_clock::now();
 

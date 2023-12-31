@@ -72,33 +72,31 @@ int main(int argc, char *argv[])
 
     // Create exporter
     NBodyEnv::Exporter exporter("test.part", 1);
-    NBodyEnv::Exporter serialExporter("serialTest.part", 1);
+    // NBodyEnv::Exporter serialExporter("serialTest.part", 1);
 
     // simulate the system many times ==> need this for testing and estimating
     // the speed up of the parallelization with OpenMP
-    constexpr int numSimulations = 20;
+    constexpr int numSimulations = 1;
 
     // array of microseconds type for each simulation
     microseconds durationsParallel[numSimulations];
     microseconds durationsSerial[numSimulations];
+
+#if defined(_OPENMP)
+    omp_set_num_threads(4);
+#endif
 
     for (int i = 0; i < numSimulations; i++)
     {
         // Get starting timepoint
         auto start = high_resolution_clock::now();
 
-#if defined(_OPENMP)
-#pragma omp parallel num_threads(4)
-        #endif
+        // simulate over a year time span
+        for (int k = 0; k < 3600 * 24; k++)
         {
-            // simulate over a year time span
-            for (int k = 0; k < 3600 * 24; k++)
-            {
-                parallelSystem.compute();
-                if (k % 3600 == 0)
-#pragma omp master
-                    exporter.saveState(parallelSystem.getParticles());
-            }
+            parallelSystem.compute();
+            if (k % 3600 == 0)
+                exporter.saveState(parallelSystem.getParticles());
         }
 
         auto stop = high_resolution_clock::now();
@@ -120,8 +118,8 @@ int main(int argc, char *argv[])
         for (int k = 0; k < 3600 * 24; k++)
         {
             serialSystem.compute();
-            if (k % 3600 == 0)
-                serialExporter.saveState(serialSystem.getParticles());
+            // if (k % 3600 == 0)
+                // serialExporter.saveState(serialSystem.getParticles());
         }
 
         stop = high_resolution_clock::now();
@@ -131,7 +129,7 @@ int main(int argc, char *argv[])
         std::cout << "Time taken by serial execution: "
                   << duration.count() << " milliseconds" << std::endl;
 
-        serialExporter.close();
+        // serialExporter.close();
     }
 
     // compute the average speed up of each simulation
