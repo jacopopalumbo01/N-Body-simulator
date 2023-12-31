@@ -38,7 +38,7 @@ namespace NBodyEnv
     std::vector<NBodyEnv::Particle> tempState(_systemParticles);
 
 #if defined(_OPENMP)
-#pragma omp for
+#pragma omp parallel for
 #endif
     // Reset forces
     for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
@@ -50,6 +50,9 @@ namespace NBodyEnv
     // boolean flag to make sure particle is updated in case all others have been absorbed
     bool updated = false;
 
+    // OLD IMPLEMENTATION, CAUSED RACE CONDITIONS probably due to the fact that
+    // inner loop starts from value i, which depends on the outer loop and is not thread safe
+    //
     // #if defined(_OPENMP)
     // #pragma omp parallel for private(updated) schedule(static)
     // #endif
@@ -80,7 +83,7 @@ namespace NBodyEnv
     //     }
 
 #if defined(_OPENMP)
-#pragma omp for private(updated) schedule(static) /*collapse(2)*/
+#pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
 #endif
     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
     {
@@ -109,7 +112,7 @@ namespace NBodyEnv
     }
 
 #if defined(_OPENMP)
-#pragma omp for
+#pragma omp parallel for
 #endif
     // need to decouple the update of the position and velocity from the
     // computation of the forces, for unknown reasons
@@ -146,7 +149,7 @@ namespace NBodyEnv
   template <>
   void System<VerletDiscretizer>::compute()
   {
-    // set number of threads 
+    // set number of threads
     // omp_set_num_threads(2);
 
     // Save current state in a temp vector
@@ -165,6 +168,9 @@ namespace NBodyEnv
     // boolean flag to make sure particle is updated in case all others have been absorbed
     bool updated = false;
 
+    // OLD IMPLEMENTATION, CAUSED RACE CONDITIONS probably due to the fact that
+    // inner loop starts from value i, which depends on the outer loop and is not thread safe
+    //
     // #if defined(_OPENMP)
     // #pragma omp for private(updated) schedule(static)
     // #endif
@@ -193,11 +199,9 @@ namespace NBodyEnv
     //       // }
     //     }
 
-    int sum = 0;
-
 #if defined(_OPENMP)
-#pragma omp parallel for private(updated) schedule(static) reduction(+:sum) 
-// #pragma omp for private(updated) schedule(static) 
+#pragma omp parallel for private(updated) schedule(static)
+// #pragma omp for private(updated) schedule(static)
 #endif
     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
     {
@@ -211,7 +215,6 @@ namespace NBodyEnv
           continue;
         _systemParticles[i].computeForce(_systemParticles[j], _func);
         updated = true;
-        sum += j;
       }
 
       if (!updated)
@@ -243,7 +246,7 @@ namespace NBodyEnv
       }
     }
 
-    // Update prev state
+    // Update previous state
     _prevState.clear();
     std::copy(tempState.begin(), tempState.end(), _prevState.begin());
   }
