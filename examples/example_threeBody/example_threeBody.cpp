@@ -1,10 +1,10 @@
-#include "../../inc/Exporter/Exporter.hpp"
-#include "../../inc/Functions/Functions.hpp"
-#include "../../inc/Particle/Particle.hpp"
-#include "../../inc/System/System.hpp"
-#include "../../inc/Collisions/Collisions.hpp"
-#include "../../inc/Functions/EulerDiscretizer.hpp"
-#include "../../inc/Functions/VerletDiscretizer.hpp"
+#include "Exporter/Exporter.hpp"
+#include "Functions/Functions.hpp"
+#include "Particle/Particle.hpp"
+#include "System/System.hpp"
+#include "Collisions/Collisions.hpp"
+#include "Functions/EulerDiscretizer.hpp"
+#include "Functions/VerletDiscretizer.hpp"
 #include <iostream>
 #include <chrono>
 #include <omp.h>

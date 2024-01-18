@@ -13,16 +13,6 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# set(HEADER_FILES
-#     ../../inc/Particle/Particle.hpp
-#     ../../inc/System/System.hpp
-#     ../../inc/Functions/Functions.hpp
-#     ../../inc/Exporter/Exporter.hpp
-#     ../../inc/Collisions/Collisions.hpp
-#     ../../inc/Functions/EulerDiscretizer.hpp
-#     ../../inc/Functions/VerletDiscretizer.hpp
-#     )
-
 set(HEADER_DIR ../../inc)
 set(HEADER_FILES
     Particle/Particle.hpp
@@ -58,16 +48,6 @@ endforeach()
 
 # Add library using the variables
 add_library(NBodyEnvLibrary ${FULL_HEADER_PATH} ${FULL_SOURCE_PATH})
-
-# add_library(NBodyEnvLibrary
-#     ../../src/Particle/Particle.cpp
-#     ../../src/System/System.cpp
-#     ../../src/Functions/Functions.cpp
-#     ../../src/Exporter/Exporter.cpp
-#     ../../src/Collisions/Collisions.cpp
-#     ../../src/Functions/EulerDiscretizer.cpp
-#     ../../src/Functions/VerletDiscretizer.cpp
-# )
 
 find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)
