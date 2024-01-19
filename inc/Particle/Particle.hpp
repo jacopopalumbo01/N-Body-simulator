@@ -34,21 +34,14 @@ namespace NBodyEnv
     double xForce;
     double yForce;
     double zForce;
+
     // Invert force
+    // TODO: remove if not used
     void invert()
     {
-#if defined(_OPENMP)
-#pragma omp atomic
-#endif // _OPENMP
-      xForce -= 2 * xForce;
-#if defined(_OPENMP)
-#pragma omp atomic
-#endif // _OPENMP
-      yForce -= 2 * yForce;
-#if defined(_OPENMP)
-#pragma omp atomic
-#endif // _OPENMP
-      zForce -= 2 * zForce;
+      xForce = - xForce;
+      yForce = - yForce;
+      zForce = - zForce;
     }
   };
 

@@ -22,6 +22,7 @@ set(HEADER_FILES
     Collisions/Collisions.hpp
     Functions/EulerDiscretizer.hpp
     Functions/VerletDiscretizer.hpp
+    TreeNode/TreeNode.hpp
 )
 
 # Create a full path for each header file
@@ -39,6 +40,7 @@ set(SOURCE_FILES
     Collisions/Collisions.cpp
     Functions/EulerDiscretizer.cpp
     Functions/VerletDiscretizer.cpp
+    TreeNode/TreeNode.cpp
 )
 
 # Create a full path for each source file
@@ -56,36 +58,23 @@ endif()
 
 # Add executable using the library and headers
 add_executable(Example
-    example_SunEarthMoon.cpp
+    ../example_speedup/example_speedup.cpp
     ${FULL_HEADER_PATH}  # Use the variables here
     ${FULL_SOURCE_PATH}  # Use the variables here
 )
 
-add_executable(ThreeBodySim
-    example_threeBody.cpp
-    ${FULL_HEADER_PATH}  # Use the variables here
-    ${FULL_SOURCE_PATH}  # Use the variables here
-)
+target_compile_options(Example PRIVATE ${OPENMP_FLAGS})
 
 target_include_directories(Example PRIVATE 
     ../../inc/
 )
 
-target_include_directories(NBodyEnvLibrary PRIVATE 
+target_include_directories(NBodyEnvLibrary PUBLIC 
     ../../inc/
 )
 
-target_include_directories(ThreeBodySim PRIVATE 
-    ../../inc/
-)
-
-
-target_compile_options(ThreeBodySim PRIVATE ${OPENMP_FLAGS})
-
-target_link_libraries(ThreeBodySim PUBLIC OpenMP::OpenMP_CXX NBodyEnvLibrary)
-target_link_libraries(Example PUBLIC OpenMP::OpenMP_CXX NBodyEnvLibrary)
-target_link_libraries(NBodyEnvLibrary PUBLIC OpenMP::OpenMP_CXX)
 # target_link_libraries(Example NBodyEnvLibrary)
-# target_link_libraries(ThreeBodySim NBodyEnvLibrary)
+target_link_libraries(Example NBodyEnvLibrary OpenMP::OpenMP_CXX)
+target_link_libraries(NBodyEnvLibrary PUBLIC OpenMP::OpenMP_CXX)
 
 

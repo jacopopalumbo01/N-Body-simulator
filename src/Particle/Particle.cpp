@@ -1,4 +1,4 @@
-#include "../../inc/Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 #include <cmath>
 #include <iostream>
 
