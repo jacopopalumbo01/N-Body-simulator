@@ -22,6 +22,7 @@ set(HEADER_FILES
     Collisions/Collisions.hpp
     Functions/EulerDiscretizer.hpp
     Functions/VerletDiscretizer.hpp
+    TreeNode/TreeNode.hpp
 )
 
 # Create a full path for each header file
@@ -39,6 +40,7 @@ set(SOURCE_FILES
     Collisions/Collisions.cpp
     Functions/EulerDiscretizer.cpp
     Functions/VerletDiscretizer.cpp
+    TreeNode/TreeNode.cpp
 )
 
 # Create a full path for each source file
