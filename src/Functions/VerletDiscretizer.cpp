@@ -1,6 +1,6 @@
-#include "../../inc/Functions/Functions.hpp"
-#include "../../inc/Functions/VerletDiscretizer.hpp"
-#include "../../inc/Collisions/Collisions.hpp"
+#include "Functions/Functions.hpp"
+#include "Functions/VerletDiscretizer.hpp"
+#include "Collisions/Collisions.hpp"
 #include <iostream>
 #include <math.h>
 #include <omp.h>

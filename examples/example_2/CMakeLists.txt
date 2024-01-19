@@ -13,11 +13,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-set(HEADER_FILES
-    ../../src/Particle/Particle.hpp
-    ../../src/Particle/EMParticle.hpp
-    ../../src/Particle/GravParticle.hpp
-)
+include_directories(../../inc)
 
 add_library(NBodyEnvLibrary
 ../../src/Particle/Particle.cpp

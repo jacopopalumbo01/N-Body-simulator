@@ -1,7 +1,7 @@
-#include "../../inc/System/System.hpp"
-#include "../../inc/Particle/Particle.hpp"
-#include "../../inc/Functions/EulerDiscretizer.hpp"
-#include "../../inc/Functions/VerletDiscretizer.hpp"
+#include "System/System.hpp"
+#include "Particle/Particle.hpp"
+#include "Functions/EulerDiscretizer.hpp"
+#include "Functions/VerletDiscretizer.hpp"
 #include <omp.h>
 
 namespace NBodyEnv

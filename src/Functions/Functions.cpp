@@ -1,5 +1,5 @@
-#include "../../inc/Functions/Functions.hpp"
-#include "../../inc/Collisions/Collisions.hpp"
+#include "Functions/Functions.hpp"
+#include "Collisions/Collisions.hpp"
 #include <iostream>
 #include <math.h>
 #include <iostream>

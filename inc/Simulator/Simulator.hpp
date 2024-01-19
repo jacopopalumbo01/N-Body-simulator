@@ -1,9 +1,9 @@
 #ifndef SIMULATOR
 #define SIMULATOR
 
-#include "../Exporter/Exporter.hpp"
-#include "../Functions/VerletDiscretizer.hpp"
-#include "../System/System.hpp"
+#include "Exporter/Exporter.hpp"
+#include "Functions/VerletDiscretizer.hpp"
+#include "System/System.hpp"
 #include <functional>
 
 namespace NBodyEnv {

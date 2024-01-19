@@ -13,15 +13,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-set(HEADER_FILES
-    ../../inc/Particle/Particle.hpp
-    ../../inc/System/System.hpp
-    ../../inc/Functions/Functions.hpp
-    ../../inc/Functions/EulerDiscretizer.hpp
-    ../../inc/Functions/VerletDiscretizer.hpp
-    ../../inc/Exporter/Exporter.hpp
-    ../../inc/Collisions/Collisions.hpp
-    )
+include_directories(../../inc)
 
 add_library(NBodyEnvLibrary
 ../../src/Particle/Particle.cpp

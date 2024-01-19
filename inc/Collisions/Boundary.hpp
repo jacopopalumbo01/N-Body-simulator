@@ -1,7 +1,7 @@
 #ifndef BOUNDARY
 #define BOUNDARY
 
-#include "../Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 
 namespace NBodyEnv
 {

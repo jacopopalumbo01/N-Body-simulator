@@ -1,7 +1,7 @@
 #ifndef VERLETDISCRETIZER
 #define VERLETDISCRETIZER
 
-#include "../Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 #include <functional>
 #include <vector>
 

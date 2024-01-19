@@ -1,7 +1,7 @@
 #ifndef FUNCTIONS
 #define FUNCTIONS
 
-#include "../Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 #include <functional>
 
 namespace NBodyEnv

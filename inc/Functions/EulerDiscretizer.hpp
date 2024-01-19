@@ -1,7 +1,7 @@
 #ifndef EULERDISCRETIZER
 #define EULERDISCRETIZER
 
-#include "../Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 #include <functional>
 
 namespace NBodyEnv
