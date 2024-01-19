@@ -1,7 +1,7 @@
 #ifndef SPHEREBOUNDARY
 #define SPHEREBOUNDARY
 
-#include "../Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 #include "Boundary.hpp"
 
 namespace NBodyEnv

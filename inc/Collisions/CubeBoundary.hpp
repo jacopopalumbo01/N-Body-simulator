@@ -1,7 +1,7 @@
 #ifndef CUBEBOUNDARY
 #define CUBEBOUNDARY
 
-#include "../Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 #include "Boundary.hpp"
 #include <vector>
 

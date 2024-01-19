@@ -1,7 +1,7 @@
 #ifndef EXPORTER
 #define EXPORTER
 
-#include "../Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 #include <fstream>
 #include <iostream>
 #include <vector>

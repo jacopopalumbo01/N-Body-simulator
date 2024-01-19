@@ -1,7 +1,7 @@
 #ifndef SYSTEM
 #define SYSTEM
 
-#include "../Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 #include <functional>
 #include <iostream>
 #include <vector>

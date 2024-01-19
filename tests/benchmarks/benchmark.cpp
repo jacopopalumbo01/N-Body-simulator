@@ -11,7 +11,7 @@
 static void NGravParticlesEulerBenchmark(benchmark::State &state) {
   for (auto _ : state) {
     NBodyEnv::System System(NBodyEnv::Functions::getGravFunc(),
-                                NBodyEnv::VerletDiscretizer(), 1.0);
+                            NBodyEnv::VerletDiscretizer(), 1.0);
 
     // Create and add test particles
     for (int i = 0; i < state.range(0); i++) {
@@ -21,7 +21,6 @@ static void NGravParticlesEulerBenchmark(benchmark::State &state) {
           {0.0, 0.0, 0.0}, rand() * 1.0e10, 50);
       System.addParticle(particle);
     }
-    
     // Create simulator
     NBodyEnv::Simulator<NBodyEnv::EulerDiscretizer> simulator(
         testSystem, (int)state.range(1));

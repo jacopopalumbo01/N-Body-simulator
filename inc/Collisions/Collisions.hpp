@@ -1,7 +1,7 @@
 #ifndef COLLISIONS
 #define COLLISIONS
 
-#include "../Particle/Particle.hpp"
+#include "Particle/Particle.hpp"
 #include <functional>
 
 namespace NBodyEnv
