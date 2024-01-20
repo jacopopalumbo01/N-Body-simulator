@@ -51,18 +51,31 @@ namespace NBodyEnv
         bool IsRoot() const;
         bool IsExternal() const;
 
+        // method to reset all the nodes after computing all the forces between particles
+        // we need to do this at the start of each time step
         void ResetNode(const std::vector<double> &center, double radius);
 
         // method to get octants
         Octant GetOctant(double x, double y, double z) const;
 
+        // method for debugging
         void PrintOctant(Octant octant) const;
 
         // method to create a new node
         TreeNode *CreateNode(Octant octant);
 
+        // method to insert a particle in the tree and sink it down to the correct 
+        // external node, aka leaf. Calls itself recursively until it reaches the correct leaf
         void InsertParticle(Particle particle, int level);
 
+        // method to compute mass of all particles contained in the node (and all its children)
+        // calls itself recursively until it reaches the leafs
+        void ComputeMass();
+        
+        // method for debugging
+        void PrintMass();
+
+        // octants of each node
         TreeNode *m_octant[8];
 
     private:
@@ -89,7 +102,7 @@ namespace NBodyEnv
         bool m_theta;
 
         // Particle that belongs to the node
-        Particle *m_particle;
+        Particle m_particle;
     };
 }
 

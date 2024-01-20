@@ -14,7 +14,9 @@ namespace NBodyEnv
           m_parent(parent),
           m_nParticles(0),
           m_theta(false),
-          m_particle(nullptr)
+          // initialize with dummy particle
+          m_particle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
+                     {0.0, 0.0, 0.0}, 0.0, 0)
     {
         for (int i = 0; i < 8; i++)
         {
@@ -113,6 +115,8 @@ namespace NBodyEnv
         m_parent = nullptr;
         m_nParticles = 0;
         m_theta = false;
+        m_particle = Particle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
+                              {0.0, 0.0, 0.0}, 0.0, 0);
     }
 
     // method to get octants
@@ -261,6 +265,7 @@ namespace NBodyEnv
         if (m_nParticles > 1)
         {
             Octant octant = GetOctant(part.getPos().xPos, part.getPos().yPos, part.getPos().zPos);
+            PrintOctant(octant);
             if (!m_octant[octant])
                 m_octant[octant] = CreateNode(octant);
 
@@ -274,8 +279,8 @@ namespace NBodyEnv
             // There is already a particle
             // subdivide the node and relocate that particle
             // print m_particle position
-            std::cout << "Particle position: " << m_particle->getPos().xPos << " " << m_particle->getPos().yPos << " " << m_particle->getPos().zPos << "\n";
-            Octant octant = GetOctant(m_particle->getPos().xPos, m_particle->getPos().yPos, m_particle->getPos().zPos);
+            std::cout << "Particle position: " << m_particle.getPos().xPos << " " << m_particle.getPos().yPos << " " << m_particle.getPos().zPos << "\n";
+            Octant octant = GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos);
             std::cout << "Octant p1 \n";
             PrintOctant(octant);
             if (m_octant[octant] == nullptr)
@@ -283,7 +288,7 @@ namespace NBodyEnv
                 m_octant[octant] = CreateNode(octant);
             }
             std::cout << "Reinsert p1 \n";
-            m_octant[octant]->InsertParticle(*m_particle, level + 1);
+            m_octant[octant]->InsertParticle(m_particle, level + 1);
             // // TODO: implement if needed
             // m_particle.Reset();
 
@@ -299,9 +304,82 @@ namespace NBodyEnv
         {
             // assing new particle as the new particle in the node
             std::cout << "Inserted particle in node\n";
-            m_particle = &part;
+            m_particle = part;
         }
 
         m_nParticles++;
     }
+
+    void TreeNode::ComputeMass()
+    {
+        if (m_nParticles == 1)
+        {
+            assert(m_particle.getSpecInfo());
+            // print current octant
+            // std::cout << "Octant ";
+            // PrintOctant(GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos));
+            m_totMass = m_particle.getSpecInfo();
+            m_cm = std::vector<double>{m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos};
+        }
+        else
+        {
+            m_totMass = 0.0;
+            m_cm = std::vector<double>{0.0, 0.0, 0.0};
+
+            for (int i = 0; i < 8; ++i)
+            {
+                if (m_octant[i])
+                {
+                    std::cout << "Octant ";
+                    PrintOctant(GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos));
+                    m_octant[i]->ComputeMass();
+                    m_totMass += m_octant[i]->m_totMass;
+                    m_cm[0] += m_octant[i]->m_cm[0] * m_octant[i]->m_totMass;
+                    m_cm[1] += m_octant[i]->m_cm[1] * m_octant[i]->m_totMass;
+                    m_cm[2] += m_octant[i]->m_cm[2] * m_octant[i]->m_totMass;
+                }
+            }
+
+            m_cm[0] /= m_totMass;
+            m_cm[1] /= m_totMass;
+            m_cm[2] /= m_totMass;
+        }
+    }
+
+    void TreeNode::PrintMass()
+    {
+        if (m_nParticles == 1)
+        {
+            assert(m_particle.getSpecInfo());
+            // std::cout << "Octant ";
+            // PrintOctant(GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos));
+            std::cout << " has mass: " << m_particle.getSpecInfo() << "\n";
+            // m_totMass = m_particle.getSpecInfo();
+            // m_cm = std::vector<double>{m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos};
+        }
+        else
+        {
+            // m_totMass = 0.0;
+            // m_cm = std::vector<double>{0.0, 0.0, 0.0};
+
+            for (int i = 0; i < 8; ++i)
+            {
+                if (m_octant[i])
+                {
+                    m_octant[i]->PrintMass();
+                    // m_totMass += m_octant[i]->m_totMass;
+                    // m_cm[0] += m_octant[i]->m_cm[0] * m_octant[i]->m_totMass;
+                    // m_cm[1] += m_octant[i]->m_cm[1] * m_octant[i]->m_totMass;
+                    // m_cm[2] += m_octant[i]->m_cm[2] * m_octant[i]->m_totMass;
+                }
+            }
+
+            std::cout << "Octant ";
+            PrintOctant(GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos));
+            // m_cm[0] /= m_totMass;
+            // m_cm[1] /= m_totMass;
+            // m_cm[2] /= m_totMass;
+        }
+    }
+
 }
