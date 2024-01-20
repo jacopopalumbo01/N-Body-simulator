@@ -102,16 +102,30 @@ namespace NBodyEnv
         return m_octant[0] == nullptr && m_octant[1] == nullptr && m_octant[2] == nullptr && m_octant[3] == nullptr && m_octant[4] == nullptr && m_octant[5] == nullptr && m_octant[6] == nullptr && m_octant[7] == nullptr;
     }
 
-    void TreeNode::ResetNode(const std::vector<double> &center)
+    void TreeNode::ResetNode(const std::vector<double> &max, const std::vector<double> &min)
     {
+        if (!IsRoot()) // only the root can be reset
+        {
+            std::cout << "Error: can't reset a node that is not the root\n";
+            return;
+        }
+
         m_totMass = 0.0;
         m_cm = {0.0, 0.0, 0.0};
-        m_center = center;
+        m_max = max;
+        m_min = min;
+        m_center = {min[0] + (max[0] - min[0]) / 2.0, min[1] + (max[1] - min[1]) / 2.0, min[2] + (max[2] - min[2]) / 2.0};
         m_parent = nullptr;
         m_nParticles = 0;
-        m_theta = false;
-        m_particle = Particle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
-                              {0.0, 0.0, 0.0}, 0.0, 0);
+        m_cm = {0.0, 0.0, 0.0};
+        m_tooClose = false;
+        m_particle = Particle(NBodyEnv::gravitational, {0.0, 0.0, 0.0}, {0.0, 0.0, 0.0}, 0.0, 0);
+        for (int i = 0; i < 8; i++)
+        {
+            // all children initially don't exist
+            delete m_octant[i];
+            m_octant[i] = nullptr;
+        }
     }
 
     // method to get an octant of the current node based on the position of a particle inside that node

@@ -55,7 +55,7 @@ namespace NBodyEnv
 
         // method to reset all the nodes after computing all the forces between particles
         // we need to do this at the start of each time step
-        void ResetNode(const std::vector<double> &center);
+        void ResetNode(const std::vector<double> &max, const std::vector<double> &min);
 
         // method to get an octant of a node, aka one of its 8 children
         Octant GetOctant(double x, double y, double z) const;

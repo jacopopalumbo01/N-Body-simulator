@@ -40,21 +40,24 @@ int main(int argc, char *argv[])
   testSystem.addParticle(particleSix);
   testSystem.addParticle(particleSeven);
 
-  NBodyEnv::TreeNode root(NBodyEnv::TreeNode(
-      {10000.0, 10000.0, 10000.0}, {-10000.0, -10000.0, -10000.0}, nullptr));
+  std::vector<double> max = {10000.0, 10000.0, 10000.0};
+  std::vector<double> min = {-10000.0, -10000.0, -10000.0};
 
-  // TODO: solve problem of insertion of first two particles in the same node
+  NBodyEnv::TreeNode root(NBodyEnv::TreeNode(max, min, nullptr));
+
+  root.ResetNode(max, min);
+
   root.InsertParticle(particleOne, 0);
   root.InsertParticle(particleTwo, 0);
   root.InsertParticle(particleThree, 0);
-  root.InsertParticle(particleFour,0);
-  root.InsertParticle(particleFive,0);
-  root.InsertParticle(particleSix,0);
-  root.InsertParticle(particleSeven,0);
+  root.InsertParticle(particleFour, 0);
+  root.InsertParticle(particleFive, 0);
+  root.InsertParticle(particleSix, 0);
+  root.InsertParticle(particleSeven, 0);
 
   root.ComputeMass();
 
-  // compute force for all particles
+  // now compute force between particles in the test system
   for (int i = 0; i < root.GetNParticles(); ++i)
   {
     // std::cout << "Computing force for particle " << i << std::endl;
@@ -63,9 +66,8 @@ int main(int argc, char *argv[])
     force[0] *= 1e10;
     force[1] *= 1e10;
     force[2] *= 1e10;
-    std::cout << "Force on particle " << i+1 << ": " << force[0] << " " << force[1] << " " << force[2] << std::endl;
   }
-
+  
   // Create exporter
   NBodyEnv::Exporter exporter("test.part", 1.0);
 
@@ -73,8 +75,7 @@ int main(int argc, char *argv[])
   testSystem.compute();
   // print force on p7
   std::cout << "Force on particle 7: " << testSystem.getParticle(6).getForce().xForce << " " << testSystem.getParticle(6).getForce().yForce << " " << testSystem.getParticle(6).getForce().zForce << std::endl;
-  
-  
+
   // // Create Simulator
   // NBodyEnv::Simulator<NBodyEnv::VerletDiscretizer> simulator(
   //     testSystem, &exporter, 1000, 10);
