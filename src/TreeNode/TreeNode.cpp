@@ -2,9 +2,14 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <cmath>
 
 namespace NBodyEnv
 {
+    // static variables initialization
+    double TreeNode::m_theta = 0.8;
+    double TreeNode::m_G = 6.67408e-11;
+
     TreeNode::TreeNode(const std::vector<double> &max, const std::vector<double> &min, TreeNode *parent)
         : m_totMass(0.0),
           m_cm({0.0, 0.0, 0.0}),
@@ -13,7 +18,7 @@ namespace NBodyEnv
           m_min(min),
           m_parent(parent),
           m_nParticles(0),
-          m_theta(false),
+          m_tooClose(false),
           // initialize with dummy particle
           m_particle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
                      {0.0, 0.0, 0.0}, 0.0, 0)
@@ -103,7 +108,7 @@ namespace NBodyEnv
 
     bool TreeNode::IsExternal() const
     {
-        return m_nParticles < 2;
+        return m_octant[0] == nullptr && m_octant[1] == nullptr && m_octant[2] == nullptr && m_octant[3] == nullptr && m_octant[4] == nullptr && m_octant[5] == nullptr && m_octant[6] == nullptr && m_octant[7] == nullptr;
     }
 
     void TreeNode::ResetNode(const std::vector<double> &center, double radius)
@@ -232,9 +237,11 @@ namespace NBodyEnv
             return new TreeNode({m_max[0], m_center[1], m_max[2]}, {m_center[0], m_min[1], m_center[2]}, this);
             break;
         case NEE:
+            std::cout << "Correct insertion\n";
             return new TreeNode(m_max, m_center, this);
             break;
         case NEI:
+            std::cout << "Correct insertion\n";
             return new TreeNode({m_center[0], m_max[1], m_max[2]}, {m_min[0], m_center[1], m_center[2]}, this);
             break;
 
@@ -248,13 +255,8 @@ namespace NBodyEnv
         }
     }
 
-    void TreeNode::InsertParticle(Particle part, int level)
+    void TreeNode::InsertParticle(const Particle &part, int level)
     {
-        // print particle position
-        // std::cout << "Particle position: " << part.getPos().xPos << " " << part.getPos().yPos << " " << part.getPos().zPos << "\n";
-        // // print min and max
-        // std::cout << "Min: " << m_min[0] << " " << m_min[1] << " " << m_min[2] << "\n";
-        // std::cout << "Max: " << m_max[0] << " " << m_max[1] << " " << m_max[2] << "\n";
         if ((part.getPos().xPos < m_min[0] || part.getPos().xPos > m_max[0]) || (part.getPos().yPos < m_min[1] || part.getPos().yPos > m_max[1]) || (part.getPos().zPos < m_min[2] || part.getPos().zPos > m_max[2]))
         {
             std::stringstream ss;
@@ -265,11 +267,12 @@ namespace NBodyEnv
         if (m_nParticles > 1)
         {
             Octant octant = GetOctant(part.getPos().xPos, part.getPos().yPos, part.getPos().zPos);
-            PrintOctant(octant);
+            // PrintOctant(octant);
             if (!m_octant[octant])
+            {
                 m_octant[octant] = CreateNode(octant);
+            }
 
-            std::cout << "Debug 1\n";
             m_octant[octant]->InsertParticle(part, level + 1);
         }
         else if (m_nParticles == 1)
@@ -278,32 +281,28 @@ namespace NBodyEnv
 
             // There is already a particle
             // subdivide the node and relocate that particle
-            // print m_particle position
-            std::cout << "Particle position: " << m_particle.getPos().xPos << " " << m_particle.getPos().yPos << " " << m_particle.getPos().zPos << "\n";
             Octant octant = GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos);
-            std::cout << "Octant p1 \n";
-            PrintOctant(octant);
+            // PrintOctant(octant);
             if (m_octant[octant] == nullptr)
             {
                 m_octant[octant] = CreateNode(octant);
             }
-            std::cout << "Reinsert p1 \n";
             m_octant[octant]->InsertParticle(m_particle, level + 1);
-            // // TODO: implement if needed
-            // m_particle.Reset();
 
             octant = GetOctant(part.getPos().xPos, part.getPos().yPos, part.getPos().zPos);
-            std::cout << "Octant p2 \n";
-            PrintOctant(octant);
-            if (!m_octant[octant])
+            // PrintOctant(octant);
+            if (m_octant[octant] == nullptr)
+            {
                 m_octant[octant] = CreateNode(octant);
-            std::cout << "Reinsert p2 \n";
+            }
+            // print the center of the octant
             m_octant[octant]->InsertParticle(part, level + 1);
+            // print number of particles in the octant
+            std::cout << "Number of particles in octant: " << m_octant[octant]->GetNParticles() << "\n";
         }
         else if (m_nParticles == 0)
         {
-            // assing new particle as the new particle in the node
-            std::cout << "Inserted particle in node\n";
+            // assign new particle as the new particle in the node
             m_particle = part;
         }
 
@@ -315,9 +314,6 @@ namespace NBodyEnv
         if (m_nParticles == 1)
         {
             assert(m_particle.getSpecInfo());
-            // print current octant
-            // std::cout << "Octant ";
-            // PrintOctant(GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos));
             m_totMass = m_particle.getSpecInfo();
             m_cm = std::vector<double>{m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos};
         }
@@ -330,8 +326,6 @@ namespace NBodyEnv
             {
                 if (m_octant[i])
                 {
-                    std::cout << "Octant ";
-                    PrintOctant(GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos));
                     m_octant[i]->ComputeMass();
                     m_totMass += m_octant[i]->m_totMass;
                     m_cm[0] += m_octant[i]->m_cm[0] * m_octant[i]->m_totMass;
@@ -346,39 +340,123 @@ namespace NBodyEnv
         }
     }
 
-    void TreeNode::PrintMass()
+    void TreeNode::PrintNodesWithParticles(const TreeNode *node)
     {
-        if (m_nParticles == 1)
+        if (node->IsExternal() && node->GetNParticles() > 0)
         {
-            assert(m_particle.getSpecInfo());
-            // std::cout << "Octant ";
-            // PrintOctant(GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos));
-            std::cout << " has mass: " << m_particle.getSpecInfo() << "\n";
-            // m_totMass = m_particle.getSpecInfo();
-            // m_cm = std::vector<double>{m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos};
+            // Print information about the node containing particles
+            std::cout << "Node Center: " << node->GetCenter()[0] << " " << node->GetCenter()[1] << " " << node->GetCenter()[2] << std::endl;
+            std::cout << "Node Octant: ";
+            node->PrintOctant(node->GetOctant(node->m_particle.getPos().xPos, node->m_particle.getPos().yPos, node->m_particle.getPos().zPos));
+            std::cout << "Particle Info: "
+                      << "Mass=" << node->m_particle.getSpecInfo() << ", Position=("
+                      << node->m_particle.getPos().xPos << ", " << node->m_particle.getPos().yPos << ", " << node->m_particle.getPos().zPos << ")" << std::endl;
+            std::cout << "------------------------" << std::endl;
         }
         else
         {
-            // m_totMass = 0.0;
-            // m_cm = std::vector<double>{0.0, 0.0, 0.0};
-
             for (int i = 0; i < 8; ++i)
             {
-                if (m_octant[i])
+                if (node->m_octant[i])
                 {
-                    m_octant[i]->PrintMass();
-                    // m_totMass += m_octant[i]->m_totMass;
-                    // m_cm[0] += m_octant[i]->m_cm[0] * m_octant[i]->m_totMass;
-                    // m_cm[1] += m_octant[i]->m_cm[1] * m_octant[i]->m_totMass;
-                    // m_cm[2] += m_octant[i]->m_cm[2] * m_octant[i]->m_totMass;
+                    PrintNodesWithParticles(node->m_octant[i]);
                 }
             }
+        }
+    }
 
-            std::cout << "Octant ";
-            PrintOctant(GetOctant(m_particle.getPos().xPos, m_particle.getPos().yPos, m_particle.getPos().zPos));
-            // m_cm[0] /= m_totMass;
-            // m_cm[1] /= m_totMass;
-            // m_cm[2] /= m_totMass;
+    std::vector<double> TreeNode::ComputeForce(const Particle &p1) const
+    {
+        // calculate the force from the barnes hut tree to the particle p1
+        std::vector<double> acc = {0.0, 0.0, 0.0};
+        double r(0), k(0), d(0);
+        if (m_nParticles == 1)
+        {
+            std::cout << "m_nParticles == 1\n";
+            acc = ComputeAcc(p1, m_particle);
+        }
+        else
+        {
+            // obtain distance between current particle and node center of mass
+            r = sqrt((p1.getPos().xPos - m_cm[0]) * (p1.getPos().xPos - m_cm[0]) +
+                     (p1.getPos().yPos - m_cm[1]) * (p1.getPos().yPos - m_cm[1]) +
+                     (p1.getPos().zPos - m_cm[2]) * (p1.getPos().zPos - m_cm[2]));
+            // obtain node width
+            d = m_max[0] - m_min[0];
+            if ((d / r) <= m_theta)
+            {
+                m_tooClose = false;
+                k = m_G * m_totMass / (r * r * r);
+                acc[0] = k * (m_cm[0] - p1.getPos().xPos);
+                acc[1] = k * (m_cm[1] - p1.getPos().yPos);
+                acc[2] = k * (m_cm[2] - p1.getPos().zPos);
+            }
+            else
+            {
+                m_tooClose = true;
+                std::vector<double> buf = {0.0, 0.0, 0.0};
+                for (int q = 0; q < 8; ++q)
+                {
+                    if (m_octant[q])
+                    {
+                        buf = m_octant[q]->ComputeForce(p1);
+                        acc[0] += buf[0];
+                        acc[1] += buf[1];
+                        acc[2] += buf[2];
+                    } // if node exists
+                }     // for all child nodes
+            }
+        }
+        return acc;
+    }
+
+    std::vector<double> TreeNode::ComputeAcc(const Particle &p1, const Particle &p2) const
+    {
+        std::vector<double> acc = {0.0, 0.0, 0.0};
+        // check if the two particles are in the same position
+        if(p1.getPos().xPos == p2.getPos().xPos && p1.getPos().yPos == p2.getPos().yPos && p1.getPos().zPos == p2.getPos().zPos)
+        {
+            return acc;
+        }
+
+        // assign references to the variables in a readable form
+        const double &x1(p1.getPos().xPos),
+            &y1(p1.getPos().yPos), &z1(p1.getPos().zPos);
+        const double &x2(p2.getPos().xPos),
+            &y2(p2.getPos().yPos), &z2(p2.getPos().zPos),
+            &m2(p2.getSpecInfo());
+
+        double r = sqrt((x1 - x2) * (x1 - x2) +
+                        (y1 - y2) * (y1 - y2) +
+                        (z1 - z2) * (z1 - z2));
+        
+        if (r > 0)
+        {
+            double k = m_G * m2 / (r * r * r);
+
+            acc[0] += k * (x2 - x1);
+            acc[1] += k * (y2 - y1);
+            acc[2] += k * (z2 - z1);
+        } // if distance is greater zero
+        else
+        {
+            // two particles on the same spot is physical nonsense!
+            // nevertheless it may happen. I just need to make sure
+            // there is no singularity...
+            acc[0] = acc[1] = acc[2] = 0;
+        }
+
+        return acc;
+    }
+
+    TreeNode::~TreeNode()
+    {
+        for (int i = 0; i < 8; ++i)
+        {
+            if (m_octant[i])
+            {
+                delete m_octant[i];
+            }
         }
     }
 

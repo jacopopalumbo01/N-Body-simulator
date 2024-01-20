@@ -19,10 +19,10 @@ namespace NBodyEnv
             NEE,
             NWI,
             NWE,
-            SWI,
-            SWE,
             SEI,
             SEE,
+            SWI,
+            SWE,
             NONE
         };
 
@@ -66,14 +66,18 @@ namespace NBodyEnv
 
         // method to insert a particle in the tree and sink it down to the correct 
         // external node, aka leaf. Calls itself recursively until it reaches the correct leaf
-        void InsertParticle(Particle particle, int level);
+        void InsertParticle(const Particle &particle, int level);
 
         // method to compute mass of all particles contained in the node (and all its children)
         // calls itself recursively until it reaches the leafs
         void ComputeMass();
         
         // method for debugging
-        void PrintMass();
+        void PrintNodesWithParticles(const TreeNode *node);
+
+        std::vector<double> ComputeForce(const Particle &part) const;
+
+        std::vector<double> ComputeAcc(const Particle &p1, const Particle &p2) const;
 
         // octants of each node
         TreeNode *m_octant[8];
@@ -99,7 +103,14 @@ namespace NBodyEnv
         // multipole acceptance criterion theta = d / r
         // where d is the node size and r is the distance between the node and the particle
         // that is being considered for force computation
-        bool m_theta;
+        static double m_theta;
+        // gravitaional constant
+        static double m_G;
+
+        // flag to check if the node is too close to the particle that is being considered
+        // for force computation ==> need to further subdivide the node in order to get a
+        // better approximation of the force
+        mutable bool m_tooClose;
 
         // Particle that belongs to the node
         Particle m_particle;
