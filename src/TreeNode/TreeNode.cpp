@@ -3,11 +3,12 @@
 #include <sstream>
 #include <cassert>
 #include <cmath>
+#include <vector>
 
 namespace NBodyEnv
 {
     // static variables initialization
-    double TreeNode::m_theta = 0.8;
+    double TreeNode::m_theta = 0.0;
     double TreeNode::m_G = 6.67408e-11;
 
     TreeNode::TreeNode(const std::vector<double> &max, const std::vector<double> &min, TreeNode *parent)
@@ -59,6 +60,16 @@ namespace NBodyEnv
     bool TreeNode::GetTheta() const
     {
         return m_theta;
+    }
+
+    std::vector<double> TreeNode::GetMax() const
+    {
+        return m_max;
+    }
+
+    std::vector<double> TreeNode::GetMin() const
+    {
+        return m_min;
     }
 
     // setters
@@ -266,7 +277,7 @@ namespace NBodyEnv
         if ((part.getPos().xPos < m_min[0] || part.getPos().xPos > m_max[0]) || (part.getPos().yPos < m_min[1] || part.getPos().yPos > m_max[1]) || (part.getPos().zPos < m_min[2] || part.getPos().zPos > m_max[2]))
         {
             std::stringstream ss;
-            ss << "Particle is out of boundaries!\n";
+            ss << "Particle " << &part << " is out of boundaries!\n";
             throw std::runtime_error(ss.str());
         }
 

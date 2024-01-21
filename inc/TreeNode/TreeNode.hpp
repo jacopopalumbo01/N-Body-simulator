@@ -41,6 +41,8 @@ namespace NBodyEnv
         TreeNode *GetParent() const;
         int GetNParticles() const;
         bool GetTheta() const;
+        std::vector<double> GetMax() const;
+        std::vector<double> GetMin() const;
 
         // setters
         void SetMass(double mass);

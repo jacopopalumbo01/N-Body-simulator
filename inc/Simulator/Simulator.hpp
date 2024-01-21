@@ -33,6 +33,22 @@ public:
     }
   }
 
+  void runBH() {
+    if (!m_export) {
+      for (int i = 0; i < m_numSteps; i++) {
+        m_system.computeBH();
+      }
+    } else {
+
+      for (int i = 0; i < m_numSteps; i++) {
+        m_system.computeBH();
+        if (i % m_numExp == 0) {
+          m_exporter->saveState(m_system.getParticles());
+        }
+      }
+    }
+  }
+
 private:
   bool m_export = false;
   int m_numSteps;

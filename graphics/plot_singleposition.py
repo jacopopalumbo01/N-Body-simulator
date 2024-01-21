@@ -24,7 +24,7 @@ d = []
 
 ##### 0 stands for X, 1 for Y, 2 for Z
 for i in range(len(a)):
-    if i % 2 == 0:
+    if i % 7 == 0:
         b.append(a[i,0])
         c.append(a[i,1])
         d.append(a[i,2])
