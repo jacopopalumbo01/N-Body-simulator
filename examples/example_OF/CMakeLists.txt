@@ -16,25 +16,21 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 include_directories(../../inc/)
 
 add_library(NBodyEnvLibrary
-../../src/Particle/Particle.cpp
-../../src/System/System.cpp
-../../src/Functions/Functions.cpp
-../../src/Functions/EulerDiscretizer.cpp
-../../src/Functions/VerletDiscretizer.cpp
-../../src/Exporter/Exporter.cpp
-../../src/Collisions/Collisions.cpp
-../../src/TreeNode/TreeNode.cpp
+    ../../src/Particle/Particle.cpp
+    ../../src/System/System.cpp
+    ../../src/Functions/Functions.cpp
+    ../../src/Functions/EulerDiscretizer.cpp
+    ../../src/Functions/VerletDiscretizer.cpp
+    ../../src/Exporter/Exporter.cpp
+    ../../src/Collisions/Collisions.cpp
+    ../../src/TreeNode/TreeNode.cpp
 )
 
 add_executable(Example
-    ../example_BH/example_BH.cpp
+    ../example_OF/example_OF.cpp
     ${HEADER_FILES}
 )
 
-add_executable(BHrandom
-    ../example_BH/example_BHrand.cpp
-    ${HEADER_FILES}
-)
-
+# Link against NBodyEnvLibrary and OFLibrary
 target_link_libraries(Example NBodyEnvLibrary)
-target_link_libraries(BHrandom NBodyEnvLibrary)
+

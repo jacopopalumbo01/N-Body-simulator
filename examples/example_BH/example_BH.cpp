@@ -13,15 +13,17 @@ int main(int argc, char *argv[])
 
   NBodyEnv::System testSystem(NBodyEnv::Functions::getGravFunc(),
                               NBodyEnv::VerletDiscretizer(), 1.0);
+  NBodyEnv::System testSystemBH(NBodyEnv::Functions::getGravFunc(),
+                              NBodyEnv::VerletDiscretizer(), 1.0);
 
   // BEAR IN MIND THAT PARTICLES SHOULD NOT BE INSERTED IN THE SAME EXACT POSITION
   // we currently do not handle this case, but when generating particles randomly this is
   // virtually impossible
   NBodyEnv::Particle particleOne(NBodyEnv::gravitational, {2000.0, 200.0, 100.0},
                                  {5e-3, 0.0, 0.0}, 1.0e10, 50);
-  NBodyEnv::Particle particleTwo(NBodyEnv::gravitational, {2000.0, 200.0, 1000.0},
+  NBodyEnv::Particle particleTwo(NBodyEnv::gravitational, {2000.0, 500.0, 1000.0},
                                  {5e-3, 0.0, 0.0}, 1.0e10, 50);
-  NBodyEnv::Particle particleThree(NBodyEnv::gravitational, {2000.0, 200.0, 1500.0},
+  NBodyEnv::Particle particleThree(NBodyEnv::gravitational, {2000.0, 700.0, 1500.0},
                                    {5e-3, 0.0, 0.0}, 1.0e10, 50);
   NBodyEnv::Particle particleFour(NBodyEnv::gravitational, {2000.0, 200.0, 2500.0},
                                   {5e-3, 0.0, 0.0}, 1.0e10, 50);
@@ -39,6 +41,14 @@ int main(int argc, char *argv[])
   testSystem.addParticle(particleFive);
   testSystem.addParticle(particleSix);
   testSystem.addParticle(particleSeven);
+
+  testSystemBH.addParticle(particleOne);
+  testSystemBH.addParticle(particleTwo);
+  testSystemBH.addParticle(particleThree);
+  testSystemBH.addParticle(particleFour);
+  testSystemBH.addParticle(particleFive);
+  testSystemBH.addParticle(particleSix);
+  testSystemBH.addParticle(particleSeven);
 
   std::vector<double> max = {10000.0, 10000.0, 10000.0};
   std::vector<double> min = {-10000.0, -10000.0, -10000.0};
@@ -61,13 +71,15 @@ int main(int argc, char *argv[])
   for (int i = 0; i < root.GetNParticles(); ++i)
   {
     // std::cout << "Computing force for particle " << i << std::endl;
-    std::vector<double> force = root.ComputeForce(testSystem.getParticle(i));
+    std::vector<double> force = root.ComputeForce(testSystemBH.getParticle(i));
     // multiply components by 1e10 to get the force
     force[0] *= 1e10;
     force[1] *= 1e10;
     force[2] *= 1e10;
+    // print force
+    std::cout << "Force on particle " << i+1 << ": " << force[0] << " " << force[1] << " " << force[2] << std::endl;
   }
-  
+
   // Create exporter
   NBodyEnv::Exporter exporter("test.part", 1.0);
 

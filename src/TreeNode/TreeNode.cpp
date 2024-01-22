@@ -8,7 +8,7 @@
 namespace NBodyEnv
 {
     // static variables initialization
-    double TreeNode::m_theta = 0.0;
+    double TreeNode::m_theta = 0.5;
     double TreeNode::m_G = 6.67408e-11;
 
     TreeNode::TreeNode(const std::vector<double> &max, const std::vector<double> &min, TreeNode *parent)
@@ -242,10 +242,10 @@ namespace NBodyEnv
             return new TreeNode({m_max[0], m_center[1], m_center[2]}, {m_center[0], m_min[1], m_min[2]}, this);
             break;
         case SEE:
-            return new TreeNode({m_max[0], m_max[1], m_center[2]}, {m_center[0], m_min[1], m_center[2]}, this);
+            return new TreeNode({m_max[0], m_max[1], m_center[2]}, {m_center[0], m_center[1], m_min[2]}, this);
             break;
         case SEI:
-            return new TreeNode({m_center[0], m_max[1], m_center[2]}, {m_min[0], m_min[1], m_center[2]}, this);
+            return new TreeNode({m_center[0], m_max[1], m_center[2]}, {m_min[0], m_center[1], m_min[2]}, this);
             break;
         case NWI:
             return new TreeNode({m_center[0], m_center[1], m_max[2]}, {m_min[0], m_min[1], m_center[2]}, this);
@@ -254,11 +254,9 @@ namespace NBodyEnv
             return new TreeNode({m_max[0], m_center[1], m_max[2]}, {m_center[0], m_min[1], m_center[2]}, this);
             break;
         case NEE:
-            std::cout << "Correct insertion\n";
             return new TreeNode(m_max, m_center, this);
             break;
         case NEI:
-            std::cout << "Correct insertion\n";
             return new TreeNode({m_center[0], m_max[1], m_max[2]}, {m_min[0], m_center[1], m_center[2]}, this);
             break;
 
@@ -277,7 +275,12 @@ namespace NBodyEnv
         if ((part.getPos().xPos < m_min[0] || part.getPos().xPos > m_max[0]) || (part.getPos().yPos < m_min[1] || part.getPos().yPos > m_max[1]) || (part.getPos().zPos < m_min[2] || part.getPos().zPos > m_max[2]))
         {
             std::stringstream ss;
-            ss << "Particle " << &part << " is out of boundaries!\n";
+            // print particle position
+            ss << "Particle position: (" << part.getPos().xPos << ", " << part.getPos().yPos << ", " << part.getPos().zPos << ")";
+            ss << " is out of boundaries!\n";
+            // print min and max
+            ss << "Min: (" << m_min[0] << ", " << m_min[1] << ", " << m_min[2] << ")";
+            ss << "Max: (" << m_max[0] << ", " << m_max[1] << ", " << m_max[2] << ")";
             throw std::runtime_error(ss.str());
         }
 
