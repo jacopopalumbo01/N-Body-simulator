@@ -16,6 +16,11 @@ namespace NBodyEnv
     {
       return getGrav;
     }
+    static Force getGravTwo(Pos &, Pos &, double, double, double, double);
+    static std::function<Force(Pos &, Pos &, double, double, double, double)> getGravFunction()
+    {
+      return getGravTwo;
+    }
   };
 } // namespace NBodyEnv
 

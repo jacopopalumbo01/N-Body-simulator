@@ -13,7 +13,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-include_directories(../../inc/)
+include_directories(../../inc)
 
 add_library(NBodyEnvLibrary
 ../../src/Particle/Particle.cpp
@@ -24,12 +24,13 @@ add_library(NBodyEnvLibrary
 ../../src/Functions/RKDiscretizer.cpp
 ../../src/Exporter/Exporter.cpp
 ../../src/Collisions/Collisions.cpp
+../../src/Simulator/Simulator.cpp
 ../../src/TreeNode/TreeNode.cpp
 )
 
-add_executable(Example_BH_2
-    ../example_BH_2/example_BH_2.cpp
+add_executable(Example
+    example_discretizer.cpp
     ${HEADER_FILES}
 )
 
-target_link_libraries(Example_BH_2 NBodyEnvLibrary)
+target_link_libraries(Example NBodyEnvLibrary)

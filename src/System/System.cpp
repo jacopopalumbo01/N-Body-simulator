@@ -248,8 +248,7 @@ namespace NBodyEnv
     _prevState.clear();
     std::copy(tempState.begin(), tempState.end(), _prevState.begin());
   }
-
-  template <>
+   template <>
   void System<EulerDiscretizer>::computeBH()
   {
     // Reset forces both in the system and in the root and insert particles in the root
@@ -338,4 +337,77 @@ namespace NBodyEnv
     }
   }
 
+
+  template <>
+  void System<RKDiscretizer>::addParticle(Particle particle)
+  {
+    _systemParticles.push_back(particle);
+    _prevState.push_back(particle);
+  }
+
+  template <>
+  const Particle &System<RKDiscretizer>::getParticle(int index) const
+  {
+    return _systemParticles[index];
+  }
+
+  template <>
+  void System<RKDiscretizer>::printParticles() const
+  {
+    for (auto iter = _systemParticles.begin(); iter != _systemParticles.end(); iter++)
+    {
+      std::cout << "Particle number " << iter.base() << " in the system" << std::endl;
+    }
+  }
+
+  template <>
+  void System<RKDiscretizer>::compute()
+  {
+    // Save current state in a temp vector
+    std::vector<NBodyEnv::Particle> tempState(_systemParticles);
+
+#if defined(_OPENMP)
+#pragma omp parallel for
+#endif
+    // Reset forces
+    for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
+         iter++)
+    {
+      iter->setForce({0.0, 0.0, 0.0});
+    }
+
+    // boolean flag to make sure particle is updated in case all others have been absorbed
+    bool updated = false;
+
+#if defined(_OPENMP)
+#pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
+#endif
+    for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
+    {
+      if (!_systemParticles[i].getVisible())
+        continue;
+      updated = false;
+
+      for (long unsigned int j = 0; j < _systemParticles.size(); ++j)
+      {
+        if (!_systemParticles[j].getVisible() || j == i)
+          continue;
+    
+        _discretizer.discretize(_systemParticles[i], _systemParticles[j], Functions::getGravFunction(), _deltaTime);
+        
+        updated = true;
+      }
+
+      if (!updated)
+      {
+        // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
+        // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
+        NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
+                                         {0.0, 0.0, 0.0}, 0, 0);
+        _discretizer.discretize(_systemParticles[i], ghostParticle, Functions::getGravFunction(), _deltaTime);
+        // should use a break here, but it's not possible in openmp
+        continue;
+      }
+    }
+  }
 } // namespace NBodyEnv

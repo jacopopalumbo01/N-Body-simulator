@@ -2,6 +2,8 @@
 #define SYSTEM
 
 #include "Particle/Particle.hpp"
+#include "Functions/Functions.hpp"
+#include "Functions/RKDiscretizer.hpp"
 #include "TreeNode/TreeNode.hpp"
 #include <functional>
 #include <iostream>

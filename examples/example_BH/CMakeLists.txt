@@ -24,6 +24,7 @@ add_library(NBodyEnvLibrary
 ../../src/Exporter/Exporter.cpp
 ../../src/Collisions/Collisions.cpp
 ../../src/TreeNode/TreeNode.cpp
+../../src/Functions/RKDiscretizer.cpp
 )
 
 add_executable(Example
