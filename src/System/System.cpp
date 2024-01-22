@@ -2,6 +2,7 @@
 #include "Particle/Particle.hpp"
 #include "Functions/EulerDiscretizer.hpp"
 #include "Functions/VerletDiscretizer.hpp"
+#include "TreeNode/TreeNode.hpp"
 #include <omp.h>
 
 namespace NBodyEnv
@@ -144,8 +145,6 @@ namespace NBodyEnv
     }
   }
 
-  // TODO the same as above for the collisions
-
   template <>
   void System<VerletDiscretizer>::compute()
   {
@@ -249,4 +248,94 @@ namespace NBodyEnv
     _prevState.clear();
     std::copy(tempState.begin(), tempState.end(), _prevState.begin());
   }
+
+  template <>
+  void System<EulerDiscretizer>::computeBH()
+  {
+    // Reset forces both in the system and in the root and insert particles in the root
+    m_root.ResetNode(m_root.GetMax(), m_root.GetMin());
+
+#if defined(_OPENMP)
+#pragma omp parallel for
+#endif
+    for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
+         iter++)
+    {
+      iter->setForce({0.0, 0.0, 0.0});
+      m_root.InsertParticle(*iter, 0);
+    }
+
+    m_root.ComputeMass();
+
+    // boolean flag to make sure particle is updated in case all others have been absorbed
+    bool updated = false;
+
+#if defined(_OPENMP)
+#pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
+#endif
+    for (int i = 0; i < m_root.GetNParticles(); ++i)
+    {
+      // std::cout << "Computing force for particle " << i << std::endl;
+      std::vector<double> force = m_root.ComputeForce(_systemParticles[i]);
+    }
+
+#if defined(_OPENMP)
+#pragma omp parallel for
+#endif
+    // need to decouple the update of the position and velocity from the
+    // computation of the forces, for unknown reasons
+    for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
+    {
+      _discretizer.discretize(_systemParticles[i], _deltaTime);
+    }
+  }
+
+  template <>
+  void System<VerletDiscretizer>::computeBH()
+  {
+    // Reset forces both in the system and in the root and insert particles in the root
+    m_root.ResetNode(m_root.GetMax(), m_root.GetMin());
+
+#if defined(_OPENMP)
+#pragma omp parallel for
+#endif
+    for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
+         iter++)
+    {
+      iter->setForce({0.0, 0.0, 0.0});
+      m_root.InsertParticle(*iter, 0);
+    }
+
+    m_root.ComputeMass();
+
+    // boolean flag to make sure particle is updated in case all others have been absorbed
+    bool updated = false;
+
+#if defined(_OPENMP)
+#pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
+#endif
+    for (int i = 0; i < m_root.GetNParticles(); ++i)
+    {
+      // std::cout << "Computing force for particle " << i << std::endl;
+      std::vector<double> force = m_root.ComputeForce(_systemParticles[i]);
+    }
+
+#if defined(_OPENMP)
+#pragma omp parallel for
+#endif
+    // need to decouple the update of the position and velocity from the
+    // computation of the forces, for unknown reasons
+    for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
+    {
+      if (_prevState[i].getPos().xPos == 0 && _prevState[i].getPos().yPos == 0 && _prevState[i].getPos().zPos == 0)
+      {
+        _discretizer.updateFirsePos(_systemParticles[i], _deltaTime);
+      }
+      else
+      {
+        _discretizer.updatePos(_systemParticles[i], _prevState[i], _deltaTime);
+      }
+    }
+  }
+
 } // namespace NBodyEnv
