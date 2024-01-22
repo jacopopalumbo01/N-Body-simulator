@@ -24,6 +24,7 @@ add_library(NBodyEnvLibrary
 ../../src/Exporter/Exporter.cpp
 ../../src/Collisions/Collisions.cpp
 ../../src/Simulator/Simulator.cpp
+../../src/TreeNode/TreeNode.cpp
 )
 
 add_executable(Example

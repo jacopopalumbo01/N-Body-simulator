@@ -45,6 +45,13 @@ namespace NBodyEnv
     }
   };
 
+  struct Acc
+  {
+    double xAcc;
+    double yAcc;
+    double zAcc;
+  };
+
   class Particle
   {
   public:
@@ -60,6 +67,9 @@ namespace NBodyEnv
     const ParticleType &getType() const { return _type; }
     const double &getSpecInfo() const { return _specInfo; }
     const bool &getVisible() const { return _visible; }
+
+    Pos getValuePos() { return _pos; }
+    Vel getValueVel() { return _vel; }
 
     // SETTERS
     void setPos(Pos pos) { _pos = pos; }

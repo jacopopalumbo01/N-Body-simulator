@@ -8,7 +8,7 @@
 namespace NBodyEnv {
   
 void EulerDiscretizer::discretize(Particle &p, double deltaTime) {
-    p.updatePos(deltaTime);
     p.updateVel(deltaTime);
+    p.updatePos(deltaTime);
 }
 } // namespace NBodyEnv

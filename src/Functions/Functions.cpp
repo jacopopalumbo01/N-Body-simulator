@@ -46,4 +46,41 @@ namespace NBodyEnv
     // p2.addForce(dummyForce);
   }
 
+  Force Functions::getGravTwo(Pos &p1, Pos &p2, double mOne, double mTwo, double radOne, double radTwo)
+  {
+
+    // Dummy force
+    Force dummyForce{0.0, 0.0, 0.0};
+
+    // compute the distance between p1 and p2 in parallel
+    double xDistance = p1.xPos - p2.xPos;
+    double yDistance = p1.yPos - p2.yPos;
+    double zDistance = p1.zPos - p2.zPos;
+    double distance = sqrt(xDistance * xDistance + yDistance * yDistance +
+                           zDistance * zDistance);
+
+    // Calculate mass product
+    double totMass = mOne * mTwo;
+
+    // Compute contributes along each axis in parallel for each component
+    double distanceCubed = distance * distance * distance;
+
+    dummyForce.xForce = (-G * totMass / distanceCubed) * xDistance;
+    dummyForce.yForce = (-G * totMass / distanceCubed) * yDistance;
+    dummyForce.zForce = (-G * totMass / distanceCubed) * zDistance;
+
+    // Detect collision between the two particles
+    if (distance <= radOne + radTwo)
+    {
+      // two particles have collided, compute perfectly inelastic collision which results in the merging of the two particles
+      // NBodyEnv::Collisions::getElasticCollision()(p1, p2);
+      dummyForce.xForce = 0.0;
+      dummyForce.yForce = 0.0;
+      dummyForce.zForce = 0.0;
+      return dummyForce;
+    }
+
+    return dummyForce;
+  }
+
 } // namespace NBodyEnv
