@@ -91,3 +91,31 @@ To run the simulator, follow these steps:
 2. Choose one of the provideed examples, or build one yourself. Bear in mind that not all of examples work due to past major changes in the project structure. You can find further information the dedicated folder.
   
 3. Try the benchmark utilities to test the time required for the code execution. Future implementations will feature an estimation of the algorithm complexity. You can infere the scalability of the program with respect to the number of objects included in the simulation. Further information in the **tests/Benchmarks** folder.
+
+## How To Run Your Code
+This library is intended to be used as a static library. There are a few steps to follow to build and use the library. 
+
+The first thing to do is compile the library. We have configured a CMakeFile to make this step as easy as possible.
+```bash
+$ mkdir build
+
+$ cd build
+
+# Compile
+$ cmake ..
+
+$ make
+```
+
+You have succesfully built the static library named "libn-body-sim.a"! Now you are ready to use the simulator.
+
+Always remember to include the library headers file in your cpp file as follows:
+```cpp
+#include <N-Body-sim.hpp>
+```
+
+To use the library we recommend you to read the full documentation.
+Now that you have written your first N-body project, you are ready to compile and run. You should always remember to include the static library and the header file. 
+```bash
+$ g++ yourFile.cpp -IPATH/TO/LIBRARY/inc -LPATH/TO/LIBRARY/build -ln-body-sim -o yourFile.o
+```

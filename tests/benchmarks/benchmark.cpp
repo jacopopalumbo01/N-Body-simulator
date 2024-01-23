@@ -1,16 +1,10 @@
-#include "../../inc/Exporter/Exporter.hpp"
-#include "../../inc/Functions/EulerDiscretizer.hpp"
-#include "../../inc/Functions/Functions.hpp"
-#include "../../inc/Functions/VerletDiscretizer.hpp"
-#include "../../inc/Particle/Particle.hpp"
-#include "../../inc/Simulator/Simulator.hpp"
-#include "../../inc/System/System.hpp"
+#include <N-Body-sim.hpp>
 #include <benchmark/benchmark.h>
 #include <cstdlib>
 
-static void NGravParticlesEulerBenchmark(benchmark::State &state) {
+static void NGravParticlesVerletBenchmark(benchmark::State &state) {
   for (auto _ : state) {
-    NBodyEnv::System System(NBodyEnv::Functions::getGravFunc(),
+    NBodyEnv::System testSystem(NBodyEnv::Functions::getGravFunc(),
                             NBodyEnv::VerletDiscretizer(), 1.0);
 
     // Create and add test particles
@@ -19,10 +13,10 @@ static void NGravParticlesEulerBenchmark(benchmark::State &state) {
           NBodyEnv::gravitational,
           {rand() * 1000.00, rand() * 1000.00, rand() * 1000.00},
           {0.0, 0.0, 0.0}, rand() * 1.0e10, 50);
-      System.addParticle(particle);
+      testSystem.addParticle(particle);
     }
     // Create simulator
-    NBodyEnv::Simulator<NBodyEnv::EulerDiscretizer> simulator(
+    NBodyEnv::Simulator<NBodyEnv::VerletDiscretizer> simulator(
         testSystem, (int)state.range(1));
     // Run simulation
     simulator.run();
@@ -31,10 +25,10 @@ static void NGravParticlesEulerBenchmark(benchmark::State &state) {
                        state.range(0)); /* O(M*N^2) */
 }
 
-static void NGravParticlesEulerExportBenchmark(benchmark::State &state) {
+static void NGravParticlesVerletExportBenchmark(benchmark::State &state) {
   for (auto _ : state) {
     NBodyEnv::System testSystem(NBodyEnv::Functions::getGravFunc(),
-                                NBodyEnv::EulerDiscretizer(), 1.0);
+                                NBodyEnv::VerletDiscretizer(), 1.0);
 
     // Create and add test particles
     for (int i = 0; i < state.range(0); i++) {
@@ -48,7 +42,7 @@ static void NGravParticlesEulerExportBenchmark(benchmark::State &state) {
     NBodyEnv::Exporter exporter("test.part", 1.0);
 
     // Create simulator
-    NBodyEnv::Simulator<NBodyEnv::EulerDiscretizer> simulator(
+    NBodyEnv::Simulator<NBodyEnv::VerletDiscretizer> simulator(
         testSystem, &exporter, (int)state.range(1), 1);
     // Run simulation
     simulator.run();
@@ -60,14 +54,14 @@ static void NGravParticlesEulerExportBenchmark(benchmark::State &state) {
 
 constexpr int simTime = 3600 * 24 * 7;
 
-BENCHMARK(NGravParticlesEulerBenchmark)
+BENCHMARK(NGravParticlesVerletBenchmark)
     ->Args({2, simTime})
     ->Args({4, simTime})
     ->Args({8, simTime})
     ->Args({16, simTime})
     ->Complexity();
 
-BENCHMARK(NGravParticlesEulerExportBenchmark)
+BENCHMARK(NGravParticlesVerletExportBenchmark)
     ->Args({2, simTime})
     ->Args({4, simTime})
     ->Args({8, simTime})
