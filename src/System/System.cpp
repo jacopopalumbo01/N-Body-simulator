@@ -266,11 +266,8 @@ namespace NBodyEnv
 
     m_root.ComputeMass();
 
-    // boolean flag to make sure particle is updated in case all others have been absorbed
-    bool updated = false;
-
 #if defined(_OPENMP)
-#pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
+#pragma omp parallel for schedule(static) /*collapse(2)*/
 #endif
     for (int i = 0; i < m_root.GetNParticles(); ++i)
     {
@@ -302,16 +299,19 @@ namespace NBodyEnv
          iter++)
     {
       iter->setForce({0.0, 0.0, 0.0});
+    }
+
+    for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
+         iter++)
+    {
       m_root.InsertParticle(*iter, 0);
     }
 
+
     m_root.ComputeMass();
 
-    // boolean flag to make sure particle is updated in case all others have been absorbed
-    bool updated = false;
-
 #if defined(_OPENMP)
-#pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
+#pragma omp parallel for schedule(static) /*collapse(2)*/
 #endif
     for (int i = 0; i < m_root.GetNParticles(); ++i)
     {

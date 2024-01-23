@@ -6,7 +6,7 @@ numPart = 7
 readEULER = []
 testEULER = []
 
-with open("./testEULER.part", 'r') as file:
+with open("./test.part", 'r') as file:
     for line in file:
         if not line.startswith('---'):
             values = [float(val) for val in line.split()[1:]]
@@ -20,7 +20,7 @@ for i in range(len(readEULER)):
 readBH = []
 testBH = []
 
-with open("./testBH08EULER.part", 'r') as file:
+with open("./testBH.part", 'r') as file:
     for line in file:
         if not line.startswith('---'):
             values = [float(val) for val in line.split()[1:]]
@@ -41,7 +41,7 @@ difference = np.abs(testBH-testEULER)
 plt.plot(x_axis, difference[:,0], label = "difference x axis")
 plt.plot(x_axis, difference[:,1], label = "difference y axis")
 plt.plot(x_axis, difference[:,2], label = "difference z axis")
-plt.title('Plot of diff btw Euler and BH computation on part 1 Over Time')
+plt.title('Plot of diff btw direct-sum and BH computation on part 1 Over Time')
 plt.legend(loc="upper left")
 plt.savefig("IsBHgood.png")
 plt.close()

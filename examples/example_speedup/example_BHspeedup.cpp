@@ -6,6 +6,7 @@
 #include "Simulator/Simulator.hpp"
 #include "System/System.hpp"
 #include "TreeNode/TreeNode.hpp"
+#include <omp.h>
 #include <iostream>
 #include <random>
 #include <chrono>
@@ -21,11 +22,17 @@ int main(int argc, char *argv[])
     NBodyEnv::System<NBodyEnv::VerletDiscretizer> systemBH(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
     // NBodyEnv::System<NBodyEnv::VerletDiscretizer> serialSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
 
-    constexpr int numParticles = 512;
+    constexpr int numParticles = 2048;
 
     // Create exporter
     NBodyEnv::Exporter exporter("test.part", 1);
     NBodyEnv::Exporter exporterBH("testBH.part", 1);
+    // NBodyEnv::Exporter exporterBH07("testBH07.part", 1);
+    // NBodyEnv::Exporter exporterBH10("testBH10.part", 1);
+
+#if defined(_OPENMP)
+    omp_set_num_threads(12);
+#endif
 
     // obtain a random number from hardware
     std::random_device rand;
@@ -50,17 +57,16 @@ int main(int argc, char *argv[])
             {0.0, 0.0, 0.0}, massDistr(gen), 15);
         system.addParticle(particle);
         systemBH.addParticle(particle);
-        // root.InsertParticle(particle, 0);
     }
 
     // simulate over a year time span
     // Get starting timepoint
     auto start = high_resolution_clock::now();
-    for (int i = 0; i < 3600; i++)
+    for (int i = 0; i < 360; i++)
     {
         // compute with direct-sum algorithm
         system.compute();
-        if (i % 360 == 0)
+        if (i % 36 == 0)
         {
             exporter.saveState(system.getParticles());
         }
@@ -71,39 +77,43 @@ int main(int argc, char *argv[])
     // Get duration. Substart timepoints to
     // get duration. To cast it to proper unit
     // use duration cast method
-    auto duration = duration_cast<milliseconds>(stop - start);
+    auto durationDS = duration_cast<milliseconds>(stop - start);
 
     std::cout << "Time taken by standard execution: "
-              << duration.count() << " milliseconds" << std::endl;
+              << durationDS.count() << " milliseconds" << std::endl;
 
     exporter.close();
 
-    // set theta
-    root.SetTheta(1.2);
+    std::vector<double> theta_vec = {0.7};
 
-    // print theta
-    std::cout << "Theta: " << root.GetTheta() << std::endl;
-    start = high_resolution_clock::now();
-
-    for (int i = 0; i < 3600; i++)
+    // loop over all theta values and simulate the system
+    for(size_t i = 0; i < theta_vec.size(); i++)
     {
-        // compute with Barnes-Hut algorithm
-        systemBH.computeBH();
-        if (i % 360== 0)
+        root.SetTheta(theta_vec[i]);
+        start = high_resolution_clock::now();
+        for (int i = 0; i < 360; i++)
         {
-            exporterBH.saveState(systemBH.getParticles());
+            // compute with Barnes-Hut algorithm
+            systemBH.computeBH();
+            if(i % 36 == 0)
+            {
+                exporterBH.saveState(systemBH.getParticles());
+            }
         }
+
+        stop = high_resolution_clock::now();
+
+        // Get duration. Substart timepoints to
+        // get duration. To cast it to proper unit
+        // use duration cast method
+        auto durationBH = duration_cast<milliseconds>(stop - start);
+
+        std::cout << "Theta = " << root.GetTheta() << " - Time taken by BH execution: "
+                << durationBH.count() << " milliseconds" << std::endl;
+
+        // print speedup between direct-sum DS and Barnes-Hut BH algorithm
+        std::cout << "Speedup: " << (double)durationDS.count() / (double)durationBH.count() << std::endl;
     }
-
-    stop = high_resolution_clock::now();
-
-    // Get duration. Substart timepoints to
-    // get duration. To cast it to proper unit
-    // use duration cast method
-    duration = duration_cast<milliseconds>(stop - start);
-
-    std::cout << "Time taken by BH execution: "
-              << duration.count() << " milliseconds" << std::endl;
 
     exporterBH.close();
 

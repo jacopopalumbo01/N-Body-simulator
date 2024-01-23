@@ -8,7 +8,7 @@
 namespace NBodyEnv
 {
     // static variables initialization
-    double TreeNode::m_theta = 0.5;
+    double TreeNode::m_theta = 0.9;
     double TreeNode::m_G = 6.67408e-11;
 
     TreeNode::TreeNode(const std::vector<double> &max, const std::vector<double> &min, TreeNode *parent)
@@ -57,7 +57,7 @@ namespace NBodyEnv
         return m_nParticles;
     }
 
-    bool TreeNode::GetTheta() const
+    double TreeNode::GetTheta() const
     {
         return m_theta;
     }
@@ -98,7 +98,7 @@ namespace NBodyEnv
         m_nParticles = nParticles;
     }
 
-    void TreeNode::SetTheta(bool theta)
+    void TreeNode::SetTheta(double theta)
     {
         m_theta = theta;
     }
@@ -261,11 +261,9 @@ namespace NBodyEnv
             break;
 
         default:
-            std::cout << "Error: Octant not found\n";
-            // TODO: throw exception
-            // std::stringstream ss;
-            // ss << "Can't determine quadrant!\n";
-            // throw std::runtime_error(ss.str().c_str());
+            std::stringstream ss;
+            ss << "Can't determine quadrant!\n";
+            throw std::runtime_error(ss.str().c_str());
             break;
         }
     }
