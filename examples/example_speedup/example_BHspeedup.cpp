@@ -22,7 +22,8 @@ int main(int argc, char *argv[])
     NBodyEnv::System<NBodyEnv::VerletDiscretizer> systemBH(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
     // NBodyEnv::System<NBodyEnv::VerletDiscretizer> serialSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
 
-    constexpr int numParticles = 2048;
+    constexpr int numParticles = 16384;
+    constexpr int timesteps = 3600;
 
     // Create exporter
     NBodyEnv::Exporter exporter("test.part", 1);
@@ -31,7 +32,7 @@ int main(int argc, char *argv[])
     // NBodyEnv::Exporter exporterBH10("testBH10.part", 1);
 
 #if defined(_OPENMP)
-    omp_set_num_threads(12);
+    omp_set_num_threads(16);
 #endif
 
     // obtain a random number from hardware
@@ -62,14 +63,14 @@ int main(int argc, char *argv[])
     // simulate over a year time span
     // Get starting timepoint
     auto start = high_resolution_clock::now();
-    for (int i = 0; i < 360; i++)
+    for (int i = 0; i < timesteps; i++)
     {
         // compute with direct-sum algorithm
         system.compute();
-        if (i % 36 == 0)
-        {
-            exporter.saveState(system.getParticles());
-        }
+        // if (i % 36 == 0)
+        // {
+        //     exporter.saveState(system.getParticles());
+        // }
     }
 
     auto stop = high_resolution_clock::now();
@@ -82,23 +83,23 @@ int main(int argc, char *argv[])
     std::cout << "Time taken by standard execution: "
               << durationDS.count() << " milliseconds" << std::endl;
 
-    exporter.close();
+    // exporter.close();
 
-    std::vector<double> theta_vec = {0.7};
+    std::vector<double> theta_vec = {0.5, 0.7, 1.0};
 
     // loop over all theta values and simulate the system
     for(size_t i = 0; i < theta_vec.size(); i++)
     {
         root.SetTheta(theta_vec[i]);
         start = high_resolution_clock::now();
-        for (int i = 0; i < 360; i++)
+        for (int i = 0; i < timesteps; i++)
         {
             // compute with Barnes-Hut algorithm
             systemBH.computeBH();
-            if(i % 36 == 0)
-            {
-                exporterBH.saveState(systemBH.getParticles());
-            }
+            // if(i % 36 == 0)
+            // {
+            //     exporterBH.saveState(systemBH.getParticles());
+            // }
         }
 
         stop = high_resolution_clock::now();
@@ -115,7 +116,7 @@ int main(int argc, char *argv[])
         std::cout << "Speedup: " << (double)durationDS.count() / (double)durationBH.count() << std::endl;
     }
 
-    exporterBH.close();
+    // exporterBH.close();
 
     return 0;
 }

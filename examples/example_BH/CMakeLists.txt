@@ -27,6 +27,11 @@ add_library(NBodyEnvLibrary
 ../../src/Functions/RKDiscretizer.cpp
 )
 
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+set(OPENMP_FLAGS "-fopenmp")
+endif()
+
 add_executable(Example
     ../example_BH/example_BH.cpp
     ${HEADER_FILES}
@@ -37,5 +42,8 @@ add_executable(BHrandom
     ${HEADER_FILES}
 )
 
+target_compile_options(BHrandom PRIVATE ${OPENMP_FLAGS})
+
 target_link_libraries(Example NBodyEnvLibrary)
-target_link_libraries(BHrandom NBodyEnvLibrary)
+target_link_libraries(BHrandom NBodyEnvLibrary OpenMP::OpenMP_CXX)
+# target_link_libraries(BHrandom NBodyEnvLibrary)

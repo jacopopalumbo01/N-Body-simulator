@@ -14,6 +14,8 @@ int main(int argc, char *argv[])
 {
     using namespace std::chrono;
 
+    int constexpr timesteps = 3600 * 24;
+
     // create a new ParticleSystem by passing the function which computes the gravitational force
     // the integration method to approximate the position numerically
     // and the time step used for the simulation over time
@@ -21,7 +23,7 @@ int main(int argc, char *argv[])
     NBodyEnv::System<NBodyEnv::VerletDiscretizer> systemBH(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
     // NBodyEnv::System<NBodyEnv::VerletDiscretizer> serialSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
 
-    constexpr int numParticles = 512;
+    constexpr int numParticles = 1024;
 
     // Create exporter
     NBodyEnv::Exporter exporter("test.part", 1);
@@ -41,6 +43,10 @@ int main(int argc, char *argv[])
 
     NBodyEnv::TreeNode root(NBodyEnv::TreeNode(max, min, nullptr));
 
+#if defined(_OPENMP)
+    omp_set_num_threads(12);
+#endif // _OPENMP
+
     // Create and add test particles
     for (int i = 0; i < numParticles; i++)
     {
@@ -56,11 +62,11 @@ int main(int argc, char *argv[])
     // simulate over a year time span
     // Get starting timepoint
     auto start = high_resolution_clock::now();
-    for (int i = 0; i < 3600; i++)
+    for (int i = 0; i < timesteps; i++)
     {
         // compute with direct-sum algorithm
         system.compute();
-        if (i % 360 == 0)
+        if (i % 36 == 0)
         {
             exporter.saveState(system.getParticles());
         }
@@ -79,33 +85,33 @@ int main(int argc, char *argv[])
     exporter.close();
 
     // set theta
-    root.SetTheta(1.2);
+    // root.SetTheta(0.5);
 
-    // print theta
-    std::cout << "Theta: " << root.GetTheta() << std::endl;
-    start = high_resolution_clock::now();
+    // // print theta
+    // std::cout << "Theta: " << root.GetTheta() << std::endl;
+    // start = high_resolution_clock::now();
 
-    for (int i = 0; i < 3600; i++)
-    {
-        // compute with Barnes-Hut algorithm
-        systemBH.computeBH();
-        if (i % 360== 0)
-        {
-            exporterBH.saveState(systemBH.getParticles());
-        }
-    }
+    // for (int i = 0; i < 3600; i++)
+    // {
+    //     // compute with Barnes-Hut algorithm
+    //     systemBH.computeBH();
+    //     if (i % 360== 0)
+    //     {
+    //         exporterBH.saveState(systemBH.getParticles());
+    //     }
+    // }
 
-    stop = high_resolution_clock::now();
+    // stop = high_resolution_clock::now();
 
-    // Get duration. Substart timepoints to
-    // get duration. To cast it to proper unit
-    // use duration cast method
-    duration = duration_cast<milliseconds>(stop - start);
+    // // Get duration. Substart timepoints to
+    // // get duration. To cast it to proper unit
+    // // use duration cast method
+    // duration = duration_cast<milliseconds>(stop - start);
 
-    std::cout << "Time taken by BH execution: "
-              << duration.count() << " milliseconds" << std::endl;
+    // std::cout << "Time taken by BH execution: "
+    //           << duration.count() << " milliseconds" << std::endl;
 
-    exporterBH.close();
+    // exporterBH.close();
 
     return 0;
 }
