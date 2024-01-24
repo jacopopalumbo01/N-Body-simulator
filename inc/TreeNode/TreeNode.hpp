@@ -40,7 +40,7 @@ namespace NBodyEnv
         const std::vector<double> &GetCenter() const;
         TreeNode *GetParent() const;
         int GetNParticles() const;
-        bool GetTheta() const;
+        double GetTheta() const;
         std::vector<double> GetMax() const;
         std::vector<double> GetMin() const;
 
@@ -50,7 +50,7 @@ namespace NBodyEnv
         void SetCenter(const std::vector<double> &center);
         void SetParent(TreeNode *parent);
         void SetNParticles(int nParticles);
-        void SetTheta(bool theta);
+        void SetTheta(double theta);
 
         bool IsRoot() const;
         bool IsExternal() const;

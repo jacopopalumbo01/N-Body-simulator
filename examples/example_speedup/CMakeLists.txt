@@ -22,6 +22,7 @@ set(HEADER_FILES
     Collisions/Collisions.hpp
     Functions/EulerDiscretizer.hpp
     Functions/VerletDiscretizer.hpp
+    Functions/RKDiscretizer.hpp
     TreeNode/TreeNode.hpp
 )
 
@@ -40,6 +41,7 @@ set(SOURCE_FILES
     Collisions/Collisions.cpp
     Functions/EulerDiscretizer.cpp
     Functions/VerletDiscretizer.cpp
+    Functions/RKDiscretizer.cpp
     TreeNode/TreeNode.cpp
 )
 
@@ -63,9 +65,20 @@ add_executable(Example
     ${FULL_SOURCE_PATH}  # Use the variables here
 )
 
+add_executable(BHspeedup
+    ../example_speedup/example_BHspeedup.cpp
+    ${FULL_HEADER_PATH}  # Use the variables here
+    ${FULL_SOURCE_PATH}  # Use the variables here
+)
+
 target_compile_options(Example PRIVATE ${OPENMP_FLAGS})
+target_compile_options(BHspeedup PRIVATE ${OPENMP_FLAGS})
 
 target_include_directories(Example PRIVATE 
+    ../../inc/
+)
+
+target_include_directories(BHspeedup PRIVATE 
     ../../inc/
 )
 
@@ -75,6 +88,7 @@ target_include_directories(NBodyEnvLibrary PUBLIC
 
 # target_link_libraries(Example NBodyEnvLibrary)
 target_link_libraries(Example NBodyEnvLibrary OpenMP::OpenMP_CXX)
+target_link_libraries(BHspeedup NBodyEnvLibrary OpenMP::OpenMP_CXX)
 target_link_libraries(NBodyEnvLibrary PUBLIC OpenMP::OpenMP_CXX)
 
 
