@@ -15,6 +15,14 @@ message(STATUS)
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS)
 
+# Include Boost Library for mk modules
+add_compile_options(-I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization)
+
+# MPI
+find_package(MPI REQUIRED)
+# openMPI
+add_definitions(-DOMPI_SKIP_MPICXX)
+
 # Project declaration
 project(n-body-sim VERSION 1.0.0 DESCRIPTION "A library for n-body simulation")
 

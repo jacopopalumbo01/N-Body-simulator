@@ -96,6 +96,17 @@ To run the simulator, follow these steps:
 This library is intended to be used as a static library. There are a few steps to follow to build and use the library. 
 
 The first thing to do is compile the library. We have configured a CMakeFile to make this step as easy as possible.
+Requirements:
+- boost library
+- mpi
+
+Our CMakeLists is built for systems with mk modules installed. If you don't have it, no problem, you just need to modify the following line of ```CMakeLists.txt```:
+```
+18 # Include Boost Library for mk modules
+19 add_compile_options(-I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization)
+```
+Instead of ```$ENV{mkBoostInc}``` and ```$ENV{mkBoostLib}``` insert the path where your boost library is installed. Then you can compile as follows.
+
 ```bash
 $ mkdir build
 
@@ -119,3 +130,14 @@ Now that you have written your first N-body project, you are ready to compile an
 ```bash
 $ g++ yourFile.cpp -IPATH/TO/LIBRARY/inc -LPATH/TO/LIBRARY/build -ln-body-sim -o yourFile.o
 ```
+
+## Running With mpi
+You should check the folder ```examples/example_MPI```. Remember to initialize and finalize mpi with:
+```cpp
+// Initialize the MPI environment
+MPI_Init(NULL, NULL);
+
+// Finalize the MPI environment.
+MPI_Finalize();
+```
+In the actual version, only systems with ```RKDiscretizer``` as discretization method have an mpi implementation.
