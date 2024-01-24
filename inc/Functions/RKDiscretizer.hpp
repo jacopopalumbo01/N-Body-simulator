@@ -29,7 +29,7 @@ namespace NBodyEnv {
             }
 
             // Discretize 
-            void discretize(Particle &particleOne, Particle &particleTwo, std::function<Force(Pos &, Pos &, double, double, double, double)> func, double deltaTime);
+            void discretize(Particle &target, Particle &particleOne, Particle &particleTwo, std::function<Force(Pos &, Pos &, double, double, double, double)> func, double deltaTime);
 
         private:
             std::vector<std::vector<double>> m_a;

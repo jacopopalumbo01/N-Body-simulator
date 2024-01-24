@@ -393,7 +393,7 @@ namespace NBodyEnv
         if (!_systemParticles[j].getVisible() || j == i)
           continue;
     
-        _discretizer.discretize(_systemParticles[i], _systemParticles[j], Functions::getGravFunction(), _deltaTime);
+        _discretizer.discretize(_systemParticles[i], tempState[i], tempState[j], Functions::getGravFunction(), _deltaTime);
         
         updated = true;
       }
@@ -404,10 +404,203 @@ namespace NBodyEnv
         // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
         NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
                                          {0.0, 0.0, 0.0}, 0, 0);
-        _discretizer.discretize(_systemParticles[i], ghostParticle, Functions::getGravFunction(), _deltaTime);
+        _discretizer.discretize(_systemParticles[i], tempState[i], ghostParticle, Functions::getGravFunction(), _deltaTime);
         // should use a break here, but it's not possible in openmp
         continue;
       }
+    }
+  }
+
+  // MPI
+  template <>
+  void System<RKDiscretizer>::computeMPI()
+  {
+    // Get the number of processes
+    int world_size;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+    // Get the rank of the process
+    int world_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+    // Master
+    if (world_rank == 0) {
+      // Save current state in a temp vector
+      std::vector<NBodyEnv::Particle> tempState(_systemParticles);
+
+      // Reset forces in parallel threads if compiled with openMP
+      #if defined(_OPENMP)
+      #pragma omp parallel for
+      #endif
+      for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
+          iter++)
+      {
+        iter->setForce({0.0, 0.0, 0.0});
+      }
+
+      // Serialize particles
+      std::string serialConversion;
+
+      boost::iostreams::back_insert_device<std::string> inserter(serialConversion);
+      boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s(inserter);
+      boost::archive::binary_oarchive send_ar(s);
+
+      send_ar << _systemParticles;
+      s.flush();
+      int len = serialConversion.size();
+
+      // Send to others
+      for (int i = world_rank + 1; i < world_size; i++) {
+        MPI_Send( &len, 1, MPI_INT, i, 0, MPI_COMM_WORLD );
+        MPI_Send( (void *)serialConversion.data(), len, MPI_BYTE, i, 0, MPI_COMM_WORLD );
+      }
+        
+      // Receive from others
+      for (int i = world_rank + 1; i < world_size; i++) {
+        // Receive len
+        int serialLen;
+        MPI_Recv( &serialLen, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+        // Receive data
+        char data[len+1];
+        MPI_Recv( data, len, MPI_BYTE, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        data[len] = '\0';
+
+        // Unserialize all
+        std::vector<NBodyEnv::Particle> temp;
+        boost::iostreams::basic_array_source<char> device(data, len);
+        boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s(device);
+        boost::archive::binary_iarchive recv_ar(s);
+
+        recv_ar >> temp;
+
+        // Get positions
+        int numParts = _systemParticles.size() / (world_size - 1); // As for workers. Master node doesn't worw
+        
+        size_t initVec = numParts * (i - 1);
+        size_t endVec = numParts * i - 1;
+    
+        if(numParts == 0 && i == 1){
+          initVec = 0;
+          endVec = _systemParticles.size() - 1;
+        }
+
+        if(numParts == 0 && i != 1)
+          continue;
+
+        // Last node has always endVec = end of the vector
+        if(i == world_size - 1)
+          endVec = _systemParticles.size() - 1;
+        
+        // Update 
+        for(int j = initVec; j <= endVec; j++)
+          _systemParticles[j] = temp[j - initVec];
+        
+
+        // End work
+      }
+    } else { // Others
+
+      // Receive len
+      int len;
+      MPI_Recv( &len, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+      // Receive data
+      char data[len+1];
+      MPI_Recv( data, len, MPI_BYTE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+      data[len] = '\0';
+
+      // Unserialize all
+      boost::iostreams::basic_array_source<char> device(data, len);
+      boost::iostreams::stream<boost::iostreams::basic_array_source<char> > s(device);
+      boost::archive::binary_iarchive recv_ar(s);
+
+      recv_ar >> _systemParticles;
+
+      std::vector<NBodyEnv::Particle> tempState(_systemParticles);
+
+      // Calculate number of particles
+      int numParts = _systemParticles.size() / (world_size - 1); // Master node doesn't work
+
+      // If the first node has numParts = 0 there are too few particles for the number all nodes.
+      // All computation will be done by the first one
+      if(numParts == 0 && world_rank == 1)
+        numParts = _systemParticles.size();
+
+      if(numParts == 0 && world_rank != 1)
+        return;
+
+      size_t initVec = numParts * (world_rank - 1);
+      size_t endVec = numParts * world_rank - 1;
+
+      // Last node has always endVec = end of the vector
+      if(world_rank == world_size - 1)
+        endVec = _systemParticles.size() - 1;
+
+      
+      // And now compute
+
+      // boolean flag to make sure particle is updated in case all others have been absorbed
+      bool updated = false;
+
+      // Here we use also openmp. If the library is compiled with it, we are going to use multiprocessor (or multi-node
+      // in a cluster) and multi-threading
+      #if defined(_OPENMP)
+      #pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
+      #endif
+      for (size_t i = initVec; i <= endVec; ++i)
+      {
+        if (!_systemParticles[i].getVisible())
+          continue;
+        updated = false;
+
+        for (long unsigned int j = 0; j < _systemParticles.size(); ++j)
+        {
+          if (!_systemParticles[j].getVisible() || j == i)
+            continue;
+      
+          _discretizer.discretize(_systemParticles[i], tempState[i], tempState[j], Functions::getGravFunction(), _deltaTime);
+          
+          updated = true;
+        }
+
+        if (!updated)
+        {
+          // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
+          // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
+          NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
+                                          {0.0, 0.0, 0.0}, 0, 0);
+          _discretizer.discretize(_systemParticles[i], tempState[i], ghostParticle, Functions::getGravFunction(), _deltaTime);
+          // should use a break here, but it's not possible in openmp
+          continue;
+        }
+      }
+
+      // Now we have to send contribute back to master
+      // Extract only computed particles
+      auto first = _systemParticles.begin() + initVec;
+      auto last  = _systemParticles.begin() + endVec + 1;
+
+      std::vector<Particle> toReturn(first, last);
+
+      // Serialize vector
+      std::string serialConversion;
+
+      boost::iostreams::back_insert_device<std::string> inserter(serialConversion);
+      boost::iostreams::stream<boost::iostreams::back_insert_device<std::string> > s2(inserter);
+      boost::archive::binary_oarchive send_ar(s2);
+
+      send_ar << toReturn;
+      s2.flush();
+      len = serialConversion.size();
+
+      // Send to master legnth of serialized string
+      MPI_Send(&len, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+
+      // Send to master serialized vector
+      MPI_Send( (void *)serialConversion.data(), len, MPI_BYTE, 0, 0, MPI_COMM_WORLD );
+
+      // Work ended
     }
   }
 } // namespace NBodyEnv

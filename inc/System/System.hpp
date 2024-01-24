@@ -9,6 +9,17 @@
 #include <iostream>
 #include <vector>
 
+// Serialization 
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/iostreams/stream_buffer.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/device/back_inserter.hpp>
+#include <boost/serialization/vector.hpp>
+
+// MPI
+#include <mpi.h>
+
 namespace NBodyEnv {
 template <class T> class System {
 public:
@@ -25,6 +36,7 @@ public:
 
   ~System() = default;
   void compute();
+  void computeMPI();
   void computeBH();
   void addParticle(Particle particle);
   void printParticles() const;
