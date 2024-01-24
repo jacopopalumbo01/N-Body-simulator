@@ -36,6 +36,8 @@ namespace NBodyEnv {
             std::vector<double> m_b;
             std::vector<double> m_c;
 
+            Vel discretizeVel(Particle &, Particle &, std::function<Force(Pos &, Pos &, double, double, double, double)>, double);
+
             // Clear all vectors
             void clear();
             // Discretizer
