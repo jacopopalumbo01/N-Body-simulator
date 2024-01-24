@@ -2,6 +2,10 @@
 #define PARTICLE
 
 #include <functional>
+
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+
 #include <omp.h>
 
 namespace NBodyEnv
@@ -20,6 +24,14 @@ namespace NBodyEnv
     double yPos;
     double zPos;
     double getDistance(Pos pos);
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & xPos;
+        ar & yPos;
+        ar & zPos;
+    }
   };
 
   struct Vel
@@ -27,6 +39,14 @@ namespace NBodyEnv
     double xVel;
     double yVel;
     double zVel;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & xVel;
+        ar & yVel;
+        ar & zVel;
+    }
   };
 
   struct Force
@@ -43,6 +63,14 @@ namespace NBodyEnv
       yForce = - yForce;
       zForce = - zForce;
     }
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & xForce;
+        ar & yForce;
+        ar & zForce;
+    }
   };
 
   struct Acc
@@ -50,11 +78,20 @@ namespace NBodyEnv
     double xAcc;
     double yAcc;
     double zAcc;
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & xAcc;
+        ar & yAcc;
+        ar & zAcc;
+    }
   };
 
   class Particle
   {
   public:
+    Particle(){};
     Particle(ParticleType type, Pos pos, Vel vel, double specInfo, double radius)
         : _type(type), _pos(pos), _vel(vel), _force({0, 0, 0}),
           _specInfo(specInfo), _radius(radius), _visible(true){};
@@ -146,6 +183,18 @@ namespace NBodyEnv
 
     ~Particle() = default;
 
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & _type;
+        ar & _pos;
+        ar & _vel;
+        ar & _force;
+        ar & _specInfo;
+        ar &_radius;
+        ar & _visible;
+    }
+
   protected:
     ParticleType _type;
     Pos _pos;
@@ -159,6 +208,7 @@ namespace NBodyEnv
     // the plot
     bool _visible;
   };
+    
 } // namespace NBodyEnv
 
 #endif
