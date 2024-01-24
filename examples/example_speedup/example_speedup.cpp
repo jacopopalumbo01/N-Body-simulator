@@ -1,10 +1,4 @@
-#include "Exporter/Exporter.hpp"
-#include "Functions/Functions.hpp"
-#include "Particle/Particle.hpp"
-#include "System/System.hpp"
-#include "Collisions/Collisions.hpp"
-#include "Functions/EulerDiscretizer.hpp"
-#include "Functions/VerletDiscretizer.hpp"
+#include <N-Body-sim.hpp>
 #include <iostream>
 #include <random>
 #include <chrono>

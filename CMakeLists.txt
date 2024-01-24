@@ -22,6 +22,11 @@ add_compile_options(-I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lbo
 find_package(MPI REQUIRED)
 # openMPI
 add_definitions(-DOMPI_SKIP_MPICXX)
+#OpenMP
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+set(OPENMP_FLAGS "-fopenmp")
+endif()
 
 # Project declaration
 project(n-body-sim VERSION 1.0.0 DESCRIPTION "A library for n-body simulation")
@@ -47,3 +52,6 @@ set_target_properties(n-body-sim PROPERTIES VERSION ${PROJECT_VERSION})
 
 # Inc directory
 target_include_directories(n-body-sim PRIVATE inc)
+
+target_link_libraries(n-body-sim OpenMP::OpenMP_CXX)
+

@@ -50,31 +50,31 @@ int main(int argc, char *argv[])
     NBodyEnv::TreeNode root(NBodyEnv::TreeNode(max, min, nullptr));
 
     // Create and add test particles
-//     for (int i = 0; i < numParticles; i++)
-//     {
-//         NBodyEnv::Particle particle(
-//             NBodyEnv::gravitational,
-//             {distr(gen), distr(gen), distr(gen)},
-//             {0.0, 0.0, 0.0}, massDistr(gen), 40);
-//         renderSystem.addParticle(particle);
-//     }
+    //     for (int i = 0; i < numParticles; i++)
+    //     {
+    //         NBodyEnv::Particle particle(
+    //             NBodyEnv::gravitational,
+    //             {distr(gen), distr(gen), distr(gen)},
+    //             {0.0, 0.0, 0.0}, massDistr(gen), 40);
+    //         renderSystem.addParticle(particle);
+    //     }
 
-// #if defined(_OPENMP)
-//     omp_set_num_threads(16);
-// #endif
+    // #if defined(_OPENMP)
+    //     omp_set_num_threads(16);
+    // #endif
 
-//     // SIMULATE SYSTEM FOR RENDERING
-//     for (int i = 0; i < timesteps; i++)
-//     {
-//         // compute with direct-sum algorithm
-//         renderSystem.compute();
-//         if (i % 3 == 0)
-//         {
-//             exporter.saveState(system.getParticles());
-//         }
-//     }
+    //     // SIMULATE SYSTEM FOR RENDERING
+    //     for (int i = 0; i < timesteps; i++)
+    //     {
+    //         // compute with direct-sum algorithm
+    //         renderSystem.compute();
+    //         if (i % 3 == 0)
+    //         {
+    //             exporter.saveState(system.getParticles());
+    //         }
+    //     }
 
-//     exporter.close();
+    //     exporter.close();
     //
     //
     //
@@ -85,9 +85,13 @@ int main(int argc, char *argv[])
     //
     //
     // PERFORMANCE TESTING FOR SPEED UP EVALUATION
-    constexpr int numParticles_sim = 16384;
-    constexpr int timesteps_sim = 360;
+    constexpr int numParticles_sim = 32768;
+    constexpr int timesteps_sim = 1;
     constexpr int num_sim = 5;
+
+#if defined(_OPENMP)
+    omp_set_num_threads(16);
+#endif
 
     for (int i = 0; i < numParticles_sim; i++)
     {
