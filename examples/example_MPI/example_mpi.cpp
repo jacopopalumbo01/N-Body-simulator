@@ -4,11 +4,11 @@
 
 
 int main() {
-    NBodyEnv::RKDiscretizer rkOne = NBodyEnv::RKDiscretizer(DISC_FEULER);
+    NBodyEnv::RKDiscretizer rkOne = NBodyEnv::RKDiscretizer(DISC_BEULER);
     NBodyEnv::RKDiscretizer rkTwo = NBodyEnv::RKDiscretizer(DISC_BEULER);
 
     NBodyEnv::System system(NBodyEnv::Functions::getGravFunc(), rkOne, 10.0);
-    NBodyEnv::System systemTwo(NBodyEnv::Functions::getGravFunc(), NBodyEnv::EulerDiscretizer(), 10.0);
+    NBodyEnv::System systemTwo(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 10.0);
 
 
     constexpr int numParticles = 32;
@@ -55,7 +55,7 @@ int main() {
 
     for (int i = 0; i < 1000; i++)
     {
-        if(world_rank == 0) // Only master exports
+        if(world_rank == 0 && i % 100 == 0) // Only master exports
             exporter.saveState(system.getParticles());
 
         system.computeMPI();
@@ -69,7 +69,8 @@ int main() {
         // Classic version
         for (int i = 0; i < 1000; i++)
         {
-            exporterTwo.saveState(systemTwo.getParticles());
+            if(i % 100 == 0)
+                exporterTwo.saveState(systemTwo.getParticles());
             systemTwo.compute();
         }
     }
