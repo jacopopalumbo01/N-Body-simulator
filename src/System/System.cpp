@@ -393,7 +393,7 @@ namespace NBodyEnv
         if (!_systemParticles[j].getVisible() || j == i)
           continue;
     
-        _discretizer.discretize(_systemParticles[i], _systemParticles[j], Functions::getGravFunction(), _deltaTime);
+        _discretizer.discretize(_systemParticles[i], tempState[i], tempState[j], Functions::getGravFunction(), _deltaTime);
         
         updated = true;
       }
@@ -404,7 +404,7 @@ namespace NBodyEnv
         // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
         NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
                                          {0.0, 0.0, 0.0}, 0, 0);
-        _discretizer.discretize(_systemParticles[i], ghostParticle, Functions::getGravFunction(), _deltaTime);
+        _discretizer.discretize(_systemParticles[i], tempState[i], ghostParticle, Functions::getGravFunction(), _deltaTime);
         // should use a break here, but it's not possible in openmp
         continue;
       }
@@ -475,9 +475,18 @@ namespace NBodyEnv
         recv_ar >> temp;
 
         // Get positions
-        int numParts = _systemParticles.size() / (world_size - 1); // As for workers. Master node doesn't work
+        int numParts = _systemParticles.size() / (world_size - 1); // As for workers. Master node doesn't worw
+        
         size_t initVec = numParts * (i - 1);
         size_t endVec = numParts * i - 1;
+    
+        if(numParts == 0 && i == 1){
+          initVec = 0;
+          endVec = _systemParticles.size() - 1;
+        }
+
+        if(numParts == 0 && i != 1)
+          continue;
 
         // Last node has always endVec = end of the vector
         if(i == world_size - 1)
@@ -508,6 +517,8 @@ namespace NBodyEnv
 
       recv_ar >> _systemParticles;
 
+      std::vector<NBodyEnv::Particle> tempState(_systemParticles);
+
       // Calculate number of particles
       int numParts = _systemParticles.size() / (world_size - 1); // Master node doesn't work
 
@@ -515,6 +526,9 @@ namespace NBodyEnv
       // All computation will be done by the first one
       if(numParts == 0 && world_rank == 1)
         numParts = _systemParticles.size();
+
+      if(numParts == 0 && world_rank != 1)
+        return;
 
       size_t initVec = numParts * (world_rank - 1);
       size_t endVec = numParts * world_rank - 1;
@@ -545,7 +559,7 @@ namespace NBodyEnv
           if (!_systemParticles[j].getVisible() || j == i)
             continue;
       
-          _discretizer.discretize(_systemParticles[i], _systemParticles[j], Functions::getGravFunction(), _deltaTime);
+          _discretizer.discretize(_systemParticles[i], tempState[i], tempState[j], Functions::getGravFunction(), _deltaTime);
           
           updated = true;
         }
@@ -556,7 +570,7 @@ namespace NBodyEnv
           // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
           NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
                                           {0.0, 0.0, 0.0}, 0, 0);
-          _discretizer.discretize(_systemParticles[i], ghostParticle, Functions::getGravFunction(), _deltaTime);
+          _discretizer.discretize(_systemParticles[i], tempState[i], ghostParticle, Functions::getGravFunction(), _deltaTime);
           // should use a break here, but it's not possible in openmp
           continue;
         }

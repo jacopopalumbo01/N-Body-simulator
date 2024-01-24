@@ -23,7 +23,7 @@ namespace NBodyEnv{
         m_c.push_back(1.0);
     }
     
-    void RKDiscretizer::discretize(Particle &particleOne, Particle &particleTwo, std::function<Force(Pos &, Pos &, double, double, double, double)> func, double deltaTime){
+    void RKDiscretizer::discretize(Particle &target, Particle &particleOne, Particle &particleTwo, std::function<Force(Pos &, Pos &, double, double, double, double)> func, double deltaTime){
         Pos tempPos;
         Pos particleTwoPos = particleTwo.getValuePos();
         Vel tempVel;
@@ -31,7 +31,7 @@ namespace NBodyEnv{
         std::vector<Acc> k;
         Acc kSum;
         // Final vel
-        Vel finalVel = {particleOne.getVel().xVel, particleOne.getVel().yVel, particleOne.getVel().zVel};
+        Vel finalVel = {0.0, 0.0, 0.0};
 
         for(size_t i = 0; i < size(m_b); ++i) {
 
@@ -82,15 +82,21 @@ namespace NBodyEnv{
         }
 
         // Save computed velocity
-        particleOne.setVel(finalVel);
+        tempVel = {target.getVel().xVel, target.getVel().yVel, target.getVel().zVel};
+
+        tempVel.xVel += finalVel.xVel;
+        tempVel.yVel += finalVel.yVel;
+        tempVel.zVel += finalVel.zVel;
+
+        target.setVel(finalVel);
 
         // Compute new position
-        tempPos = {particleOne.getPos().xPos, particleOne.getPos().yPos, particleOne.getPos().zPos};
+        tempPos = {target.getPos().xPos, target.getPos().yPos, target.getPos().zPos};
         tempPos.xPos += deltaTime * finalVel.xVel;
         tempPos.yPos += deltaTime * finalVel.yVel;
         tempPos.zPos += deltaTime * finalVel.zVel;
 
         // Save new position
-        particleOne.setPos(tempPos);
+        target.setPos(tempPos);
     }
 }

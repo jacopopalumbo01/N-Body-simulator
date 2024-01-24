@@ -4,11 +4,11 @@
 
 
 int main() {
-    NBodyEnv::RKDiscretizer rkOne = NBodyEnv::RKDiscretizer(DISC_BEULER);
+    NBodyEnv::RKDiscretizer rkOne = NBodyEnv::RKDiscretizer(DISC_FEULER);
     NBodyEnv::RKDiscretizer rkTwo = NBodyEnv::RKDiscretizer(DISC_BEULER);
 
     NBodyEnv::System system(NBodyEnv::Functions::getGravFunc(), rkOne, 10.0);
-    NBodyEnv::System systemTwo(NBodyEnv::Functions::getGravFunc(), rkTwo, 10.0);
+    NBodyEnv::System systemTwo(NBodyEnv::Functions::getGravFunc(), NBodyEnv::EulerDiscretizer(), 10.0);
 
 
     constexpr int numParticles = 32;
@@ -42,22 +42,40 @@ int main() {
 
     // Initialize the MPI environment
     MPI_Init(NULL, NULL);
-    for (int i = 0; i < 10; i++)
+
+    // Get the number of processes
+    int world_size;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
+    // Get the rank of the process
+    int world_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+    std::cout << "Computing with mpi. Number of nodes: " << world_size << std::endl;
+
+    for (int i = 0; i < 1000; i++)
     {
-        exporter.saveState(system.getParticles());
+        if(world_rank == 0) // Only master exports
+            exporter.saveState(system.getParticles());
+
         system.computeMPI();
+        MPI_Barrier(MPI_COMM_WORLD);
     }
 
     exporter.close();
-    // Finalize the MPI environment.
-    MPI_Finalize();
+    
 
-    // Classic version
-    for (int i = 0; i < 10; i++)
-    {
-        exporterTwo.saveState(systemTwo.getParticles());
-        systemTwo.compute();
+    if (world_rank == 0){
+        // Classic version
+        for (int i = 0; i < 1000; i++)
+        {
+            exporterTwo.saveState(systemTwo.getParticles());
+            systemTwo.compute();
+        }
     }
 
     exporterTwo.close();
+
+    // Finalize the MPI environment.
+    MPI_Finalize();
 }
