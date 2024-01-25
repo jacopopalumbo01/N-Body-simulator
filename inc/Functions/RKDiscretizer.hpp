@@ -7,7 +7,7 @@
 
 // Explicit Euler
 #define DISC_FEULER 1
-// Explicir Midpoint
+// Explicit Midpoint
 #define DISC_EXPMID 6
 // Heun
 #define DISC_HEUN 7

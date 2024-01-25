@@ -56,3 +56,7 @@ The actual available discretizers are:
 - ```NBodyEnv::VerletDiscretizer```
 
 You can read more about discretizer in [Discretizers](Discretizers.md)
+
+
+
+[Back to Index](Index.md)
