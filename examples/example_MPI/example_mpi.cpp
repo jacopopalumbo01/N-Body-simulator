@@ -1,10 +1,11 @@
 #include <iostream>
 #include <N-Body-sim.hpp>
 #include <random>
+#include <omp.h>
 
 
 int main() {
-    NBodyEnv::RKDiscretizer rkOne = NBodyEnv::RKDiscretizer(DISC_BEULER);
+    NBodyEnv::RKDiscretizer rkOne = NBodyEnv::RKDiscretizer(DISC_RK4);
     NBodyEnv::RKDiscretizer rkTwo = NBodyEnv::RKDiscretizer(DISC_BEULER);
 
     NBodyEnv::System system(NBodyEnv::Functions::getGravFunc(), rkOne, 10.0);
@@ -39,6 +40,10 @@ int main() {
 
     
     // MPI version
+    // set number of threads
+    #if defined(_OPENMP)
+        omp_set_num_threads(1);
+    #endif // _OPENMP
 
     // Initialize the MPI environment
     MPI_Init(NULL, NULL);
