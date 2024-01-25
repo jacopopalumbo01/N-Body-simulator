@@ -68,3 +68,6 @@ $ g++ yourFile.cpp -IPATH/TO/LIBRARY/inc -LPATH/TO/LIBRARY/build -ln-body-sim -f
 ```
 
 The optimal solution is to use as a template a ```CMakeLists.txt``` included in the examples.
+
+
+[Back to Index](Index.md)

@@ -53,4 +53,13 @@ void NBodyEnv::Forceinvert();
 ## System
 [See System docs](System.md)
 
+## EulerDiscretizer
+[See Discretizers docs](Discretizers.md)
 
+## RKDiscretizer
+[See Discretizers docs](Discretizers.md)
+
+## VerletDiscretizer
+[See Discretizers docs](Discretizers.md)
+
+[Back to Index](Index.md)
