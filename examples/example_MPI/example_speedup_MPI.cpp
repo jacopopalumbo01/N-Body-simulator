@@ -14,7 +14,7 @@ int main()
     NBodyEnv::System system(NBodyEnv::Functions::getGravFunc(), rkOne, 10.0);
     NBodyEnv::System systemTwo(NBodyEnv::Functions::getGravFunc(), NBodyEnv::EulerDiscretizer(), 10.0);
 
-    constexpr int numParticles = 4096;
+    constexpr int numParticles = 16;
 
     // obtain a random number from hardware
     std::random_device rand;
@@ -41,7 +41,7 @@ int main()
 
     // set number of threads
 #if defined(_OPENMP)
-    omp_set_num_threads(8);
+    omp_set_num_threads(1);
 #endif // _OPENMP
 
     // MPI version
@@ -84,7 +84,7 @@ int main()
     exporter.close();
 
 #if defined(_OPENMP)
-    omp_set_num_threads(16);
+    omp_set_num_threads(4);
 #endif // _OPENMP
 
     if (world_rank == 0)
