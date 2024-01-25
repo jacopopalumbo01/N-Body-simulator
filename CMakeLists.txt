@@ -16,7 +16,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS)
 
 # Include Boost Library for mk modules
-add_compile_options(-I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization)
+add_compile_options(-Ofast -funroll-all-loops -I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization)
 
 # MPI
 find_package(MPI REQUIRED)
