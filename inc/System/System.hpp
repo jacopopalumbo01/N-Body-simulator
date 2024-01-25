@@ -35,8 +35,13 @@ public:
       m_root(NBodyEnv::TreeNode({10000.0, 10000.0, 10000.0}, {-10000.0, -10000.0, -10000.0}, nullptr)){};
 
   ~System() = default;
+  // standard parallel version with OpenMP
   void compute();
+  // bare serial version
+  void computeSerial();
+  // openMP-MPI hybrid version
   void computeMPI();
+  // Barnes-Hut with OpenMP 
   void computeBH();
   void addParticle(Particle particle);
   void printParticles() const;

@@ -13,10 +13,26 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
+add_compile_options(-I../../../inc -L../../../build -I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization -Ofast -funroll-all-loops)
+
+find_package(MPI REQUIRED)
+# openMPI
+add_definitions(-DOMPI_SKIP_MPICXX)
+
 find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)
 set(OPENMP_FLAGS "-fopenmp")
 endif()
+
+add_executable(Example
+example_speedup.cpp
+${HEADER_FILES}
+)
+
+add_executable(BHspeedup
+example_BHspeedup.cpp
+${HEADER_FILES}
+)
 
 target_compile_options(Example PRIVATE ${OPENMP_FLAGS})
 target_compile_options(BHspeedup PRIVATE ${OPENMP_FLAGS})
@@ -30,7 +46,8 @@ target_include_directories(BHspeedup PRIVATE
 )
 
 # target_link_libraries(Example NBodyEnvLibrary)
-target_link_libraries(Example NBodyEnvLibrary OpenMP::OpenMP_CXX)
-target_link_libraries(BHspeedup NBodyEnvLibrary OpenMP::OpenMP_CXX)
+target_link_libraries(Example OpenMP::OpenMP_CXX ${MPI_C_LIBRARIES} ${CMAKE_SOURCE_DIR}/../../build/libn-body-sim.a $ENV{mkBoostLib}/libboost_iostreams.so $ENV{mkBoostLib}/libboost_serialization.so)
+target_link_libraries(BHspeedup OpenMP::OpenMP_CXX ${MPI_C_LIBRARIES} ${CMAKE_SOURCE_DIR}/../../build/libn-body-sim.a $ENV{mkBoostLib}/libboost_iostreams.so $ENV{mkBoostLib}/libboost_serialization.so)
+
 
 

@@ -13,6 +13,8 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
+add_compile_options(-I../../../inc -L../../../build -I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization -Ofast -funroll-all-loops)
+
 include_directories(../../inc)
 
 add_library(NBodyEnvLibrary
@@ -28,6 +30,10 @@ add_library(NBodyEnvLibrary
 ../../src/TreeNode/TreeNode.cpp
 )
 
+find_package(MPI REQUIRED)
+# openMPI
+add_definitions(-DOMPI_SKIP_MPICXX)
+
 find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)
 set(OPENMP_FLAGS "-fopenmp")
@@ -37,11 +43,17 @@ add_executable(Galaxy
     example_galaxy.cpp
     ${HEADER_FILES}
 )
+
 add_executable(StarCluster
     example_star_cluster.cpp
     ${HEADER_FILES}
 )
 
-target_link_libraries(Galaxy NBodyEnvLibrary OpenMP::OpenMP_CXX)
-target_link_libraries(StarCluster NBodyEnvLibrary OpenMP::OpenMP_CXX)
-# target_link_libraries(Example NBodyEnvLibrary)
+add_executable(RotatingDisk
+    example_rotating_disk.cpp
+    ${HEADER_FILES}
+)
+
+target_link_libraries(Galaxy NBodyEnvLibrary OpenMP::OpenMP_CXX ${MPI_C_LIBRARIES} ${CMAKE_SOURCE_DIR}/../../build/libn-body-sim.a $ENV{mkBoostLib}/libboost_iostreams.so $ENV{mkBoostLib}/libboost_serialization.so)
+target_link_libraries(StarCluster NBodyEnvLibrary OpenMP::OpenMP_CXX ${MPI_C_LIBRARIES} ${CMAKE_SOURCE_DIR}/../../build/libn-body-sim.a $ENV{mkBoostLib}/libboost_iostreams.so $ENV{mkBoostLib}/libboost_serialization.so)
+target_link_libraries(RotatingDisk NBodyEnvLibrary OpenMP::OpenMP_CXX ${MPI_C_LIBRARIES} ${CMAKE_SOURCE_DIR}/../../build/libn-body-sim.a $ENV{mkBoostLib}/libboost_iostreams.so $ENV{mkBoostLib}/libboost_serialization.so)
