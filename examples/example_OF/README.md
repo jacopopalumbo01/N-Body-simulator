@@ -3,4 +3,8 @@ We chose this external library to produce more stylish visualizations for our si
 If you wish to do this, head over the [OpenFrameworks website](https://openframeworks.cc/download/) and download a suitable version of the library. The installation and compilation process depends on your operating system. \\
 You also need to install the OfxBloom addon, which can be found [here](https://github.com/P-A-N/ofxBloom).
 Bear in mind that this code can't be actually run inside this project, it just serves as an example of the process used to produce the graphic rendering of the simulation. In order to execute this code, you need to create a new project with OpenFrameworks project installer, which automatically produces all the files necessary for compilation and library linking. The new folder should be created in /pathToOpenFrameworks/apps/myApps. Remember to include the ofxBloom addon! \\
-If you feel discouraged by this process, we can still give you a taste of what the result may look like.
+If you feel discouraged by this process, we can still give you a taste of what the result may look like. Enjoy this simulation of 1024 particles evolving over 86400 time steps!
+
+https://github.com/jacopopalumbo01/N-Body-simulator/assets/118806991/ab00e8d7-cbfc-4d37-82f5-f27365f88d2b
+
+
