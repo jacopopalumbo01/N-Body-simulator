@@ -66,7 +66,7 @@ The total force acting on each particle is the sum of the individual forces from
 ### Integration Method
 
 To update the positions and velocities of particles over time, the simulator uses a numerical integration method. The input is the acceleration that has been computed with the above formula. We are interested in the new velocities and positions of the bodies at each time step of the simulation, therefore we need to approximate the integral of the acceleration.
-The choice of integration method is crucial for accuracy and stability. The user can configure the simulation parameters, including the integration time step, to achieve a balance between accuracy and computational efficiency. We offer a wide array of numerical methods, ranging from simple Forward Euler method and the more precise and stable Verlet method, as well as several Runge-Kutta multistage methods. More information can be found in the docs folder [link](/docs/). The integration method is passed as template parameter to the particle system.
+The choice of integration method is crucial for accuracy and stability. The user can configure the simulation parameters, including the integration time step, to achieve a balance between accuracy and computational efficiency. We offer a wide array of numerical methods, ranging from simple Forward Euler method and the more precise and stable Verlet method, as well as several Runge-Kutta multistage methods. More information can be found in the [docs folder](/docs/). The integration method is passed as template parameter to the particle system.
 
 ## Project Structure
 
@@ -74,7 +74,7 @@ The project is structured as follows:
 
 - **examples** folder contains tests of the code of incremental complexity. Bear in mind that the structure of the project has changed throughout its development, therefore some examples may be obsolete and not working anymore. We kept them as an historical record of our work over the project.
   
-- **graphics** folder includes the python scripts necessary for parsing the output files produced by the examples and creating the plot of the system over time. This is one of two ways to visualize the simulation graphically and surely the less impressive one. If you'd like a more beautiful and immersive simulation, head over the folder [link](/examples/example_OF/) and check out the OpenFrameworks library. The relative git repository is included in the submodules, have a look at it if you are interested.
+- **graphics** folder includes the python scripts necessary for parsing the output files produced by the examples and creating the plot of the system over time. This is one of two ways to visualize the simulation graphically and surely the less impressive one. If you'd like a more beautiful and immersive simulation, head over [this folder](/examples/example_OF/) and check out the OpenFrameworks library. The relative git repository is included in the submodules, have a look at it if you are interested.
   
 - **inc** folder contains all the *hpp* files that constitute the core of the simulator. It is further partitioned in all the classes that describe its structure.
   
