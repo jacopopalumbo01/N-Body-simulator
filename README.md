@@ -1,4 +1,5 @@
 # N-body Simulator for Gravitational Objects
+Project developed for Advanced Methods for Scientific Computing course of the HPC Engineering degree at Politecnico di Milano.
 
 ## Students
 
@@ -21,7 +22,8 @@ The N-body problem is a generalization of the two-body problem, where the gravit
 
 #### Well-Posedness
 
-Analytically, the N-body problem is often not well-posed, meaning that small changes in initial conditions can lead to significant differences in the long-term behavior of the system. This sensitivity to initial conditions is a hallmark of chaotic systems. Therefore, predicting the precise trajectories of N bodies over extended periods can be inherently challenging.
+The N-body problem can't be solved analytically in an efficient way and is also chaotic, meaning that small changes in initial conditions can lead to significant differences in the long-term behavior of the system. This sensitivity to initial conditions is a hallmark of unstable systems. Therefore, predicting the precise trajectories of N bodies over extended periods can be inherently challenging.
+
 
 #### Approximations
 
@@ -63,7 +65,8 @@ The total force acting on each particle is the sum of the individual forces from
 
 ### Integration Method
 
-To update the positions and velocities of particles over time, the simulator uses a numerical integration method. The choice of integration method is crucial for accuracy and stability. The user can configure the simulation parameters, including the integration time step, to achieve a balance between accuracy and computational efficiency. We offer a choice between the explicit Forward Euler method and the more precise and stable Verlet method, which are passed as template parameters to the particle system. Future implementations will use Runge-Kutta method featuring an adaptive step size.
+To update the positions and velocities of particles over time, the simulator uses a numerical integration method. The input is the acceleration that has been computed with the above formula. We are interested in the new velocities and positions of the bodies at each time step of the simulation, therefore we need to approximate the integral of the acceleration.
+The choice of integration method is crucial for accuracy and stability. The user can configure the simulation parameters, including the integration time step, to achieve a balance between accuracy and computational efficiency. We offer a wide array of numerical methods, ranging from simple Forward Euler method and the more precise and stable Verlet method, as well as several Runge-Kutta multistage methods. More information can be found in the docs folder [link](/docs/). The integration method is passed as template parameter to the particle system.
 
 ## Project Structure
 
@@ -71,15 +74,15 @@ The project is structured as follows:
 
 - **examples** folder contains tests of the code of incremental complexity. Bear in mind that the structure of the project has changed throughout its development, therefore some examples may be obsolete and not working anymore. We kept them as an historical record of our work over the project.
   
-- **graphics** folder includes the scripts necessary for parsing the output files produced by the examples and creating the plot of the system over time.
+- **graphics** folder includes the python scripts necessary for parsing the output files produced by the examples and creating the plot of the system over time. This is one of two ways to visualize the simulation graphically and surely the less impressive one. If you'd like a more beautiful and immersive simulation, head over the folder [link](/examples/example_OF/) and check out the OpenFrameworks library. The relative git repository is included in the submodules, have a look at it if you are interested.
   
 - **inc** folder contains all the *hpp* files that constitute the core of the simulator. It is further partitioned in all the classes that describe its structure.
   
 - **src** folder contains all the *cpp* files that implement the method declared in the files above.
   
-- **docs** folder will be filled in the future, for the exam project
+- **docs** folder contains a brief description of the main classes and relative methods, as well as a detailed report on the project structure, the numerical methods involved and the tests that were run to asses its performance.
   
-- **tests/benchmarks** folder allows the user to test the code and extract performance parameters depending on the number of particles involved in the simulation. It is based on the Google Benchmark repository, which is linked above.
+- **tests/benchmarks** folder allows you to test the code and extract performance parameters depending on the number of particles involved in the simulation. It is based on the Google Benchmark repository, which is linked above.
   
 
 ## Getting Started

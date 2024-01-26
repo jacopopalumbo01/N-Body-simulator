@@ -1,7 +1,7 @@
 import numpy as np
 
 # Specify the path to your file
-file_path = './galaxy_test.part'
+file_path = './test.part'
 
 # Initialize empty lists to store data
 data_list = []
