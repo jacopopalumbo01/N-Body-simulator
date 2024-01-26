@@ -8,10 +8,14 @@ int main(int argc, char *argv[])
     // create a new ParticleSystem by passing the function which computes the gravitational force
     // the integration method to approximate the position numerically
     // and the time step used for the simulation over time
-    NBodyEnv::System<NBodyEnv::VerletDiscretizer> system(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
+    NBodyEnv::System<NBodyEnv::EulerDiscretizer> system(NBodyEnv::Functions::getGravFunc(), NBodyEnv::EulerDiscretizer(), 1);
 
-    constexpr int numParticles = 2048;
-    constexpr int timeSteps = 3600;
+    constexpr int numParticles = 1024;
+    // constexpr int numParticles = 32;
+    // time steps of cool and very_cool tests
+    // constexpr int timeSteps = 3600*24;
+    constexpr int timeSteps = 3600*24;
+    // constexpr int timeSteps = 3600;
 
 
     // obtain a random number from hardware
@@ -19,7 +23,7 @@ int main(int argc, char *argv[])
     // seed the generator
     std::mt19937 gen(rand());
     // define the range for particle positions
-    std::uniform_real_distribution<> distr(-4000.0, 4000.0);
+    std::uniform_real_distribution<> distr(-1000.0, 1000.0);
     // define the range for particle masses
     std::uniform_real_distribution<> massDistr(1.0e10, 1.0e11);
 
@@ -28,18 +32,20 @@ int main(int argc, char *argv[])
     {
         NBodyEnv::Particle particle(
             NBodyEnv::gravitational,
-            {1e3 + distr(gen), 1e3 + distr(gen), distr(gen)},
-            {0.0, 0.0, 0.0}, massDistr(gen), 30);
+            {3e3 + distr(gen), 3e3 + distr(gen), distr(gen)},
+            {0, -3e-1, 0.0}, massDistr(gen), 50);
         system.addParticle(particle);
     }
 
+    // print all velocity components of the first particle
+    // std::cout << "Velocity: " << system.getParticles()[0].getVel().xVel << " " << system.getParticles()[0].getVel().yVel << " " << system.getParticles()[0].getVel().zVel << std::endl;
     // Create left upper cluster
     for (int i = 0; i < numParticles/4; i++)
     {
         NBodyEnv::Particle particle(
             NBodyEnv::gravitational,
-            {-1e3 + distr(gen), 1e3 + distr(gen), distr(gen)},
-            {0.0, 0.0, 0.0}, massDistr(gen), 30);
+            {-3e3 + distr(gen), 3e3 + distr(gen), distr(gen)},
+            {3e-1, 0, 0.0}, massDistr(gen), 50);
         system.addParticle(particle);
     }
 
@@ -48,8 +54,8 @@ int main(int argc, char *argv[])
     {
         NBodyEnv::Particle particle(
             NBodyEnv::gravitational,
-            {-1e3 + distr(gen), -1e3 + distr(gen), distr(gen)},
-            {0.0, 0.0, 0.0}, massDistr(gen), 30);
+            {-3e3 + distr(gen), -3e3 + distr(gen), distr(gen)},
+            {0, 3e-1, 0.0}, massDistr(gen), 50);
         system.addParticle(particle);
     }
     
@@ -58,8 +64,8 @@ int main(int argc, char *argv[])
     {
         NBodyEnv::Particle particle(
             NBodyEnv::gravitational,
-            {1e3 + distr(gen), -1e3 + distr(gen), distr(gen)},
-            {0.0, 0.0, 0.0}, massDistr(gen), 30);
+            {3e3 + distr(gen), -3e3 + distr(gen), distr(gen)},
+            {-3e-1, 0, 0.0}, massDistr(gen), 50);
         system.addParticle(particle);
     }
 
@@ -84,7 +90,7 @@ int main(int argc, char *argv[])
     for (int i = 0; i < timeSteps; i++)
     {
         system.compute();
-        if (i % 10 == 0)
+        if (i % 36 == 0)
             exporter.saveState(system.getParticles());
     }
 
