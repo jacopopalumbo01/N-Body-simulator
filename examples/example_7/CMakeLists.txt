@@ -13,7 +13,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-include_directories(../../inc)
+include_directories(../../include)
 
 add_library(NBodyEnvLibrary
 ../../src/Particle/Particle.cpp

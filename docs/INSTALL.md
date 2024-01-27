@@ -64,7 +64,7 @@ To use the library we recommend you to read the full documentation.
 Now that you have written your first N-body project, you are ready to compile and run. You should always remember to include the static library and the header file. 
 
 ```bash
-$ g++ yourFile.cpp -IPATH/TO/LIBRARY/inc -LPATH/TO/LIBRARY/build -ln-body-sim -fopenmp -o yourFile.o
+$ g++ yourFile.cpp -IPATH/TO/LIBRARY/include -LPATH/TO/LIBRARY/build -ln-body-sim -fopenmp -o yourFile.o
 ```
 
 The optimal solution is to use as a template a ```CMakeLists.txt``` included in the examples.

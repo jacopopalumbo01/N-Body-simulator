@@ -76,7 +76,7 @@ The project is structured as follows:
   
 - **graphics** folder includes the python scripts necessary for parsing the output files produced by the examples and creating the plot of the system over time. This is one of two ways to visualize the simulation graphically and surely the less impressive one. If you'd like a more beautiful and immersive simulation, head over [this folder](/examples/example_OF/) and check out the OpenFrameworks library. The relative git repository is included in the submodules, have a look at it if you are interested.
   
-- **inc** folder contains all the *hpp* files that constitute the core of the simulator. It is further partitioned in all the classes that describe its structure.
+- **include** folder contains all the *hpp* files that constitute the core of the simulator. It is further partitioned in all the classes that describe its structure.
   
 - **src** folder contains all the *cpp* files that implement the method declared in the files above.
   
@@ -131,7 +131,7 @@ Always remember to include the library headers file in your cpp file as follows:
 To use the library we recommend you to read the full documentation.
 Now that you have written your first N-body project, you are ready to compile and run. You should always remember to include the static library and the header file. 
 ```bash
-$ g++ yourFile.cpp -IPATH/TO/LIBRARY/inc -LPATH/TO/LIBRARY/build -ln-body-sim -o yourFile.o
+$ g++ yourFile.cpp -IPATH/TO/LIBRARY/include -LPATH/TO/LIBRARY/build -ln-body-sim -o yourFile.o
 ```
 
 ## Running With mpi

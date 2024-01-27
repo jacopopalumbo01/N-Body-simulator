@@ -11,11 +11,7 @@ int main(int argc, char *argv[])
     NBodyEnv::System<NBodyEnv::EulerDiscretizer> system(NBodyEnv::Functions::getGravFunc(), NBodyEnv::EulerDiscretizer(), 1);
 
     constexpr int numParticles = 1024;
-    // constexpr int numParticles = 32;
-    // time steps of cool and very_cool tests
-    // constexpr int timeSteps = 3600*24;
     constexpr int timeSteps = 3600*24;
-    // constexpr int timeSteps = 3600;
 
 
     // obtain a random number from hardware
@@ -37,8 +33,6 @@ int main(int argc, char *argv[])
         system.addParticle(particle);
     }
 
-    // print all velocity components of the first particle
-    // std::cout << "Velocity: " << system.getParticles()[0].getVel().xVel << " " << system.getParticles()[0].getVel().yVel << " " << system.getParticles()[0].getVel().zVel << std::endl;
     // Create left upper cluster
     for (int i = 0; i < numParticles/4; i++)
     {

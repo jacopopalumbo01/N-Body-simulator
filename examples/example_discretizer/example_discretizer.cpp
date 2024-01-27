@@ -1,10 +1,10 @@
-#include "../../inc/Exporter/Exporter.hpp"
-#include "../../inc/Functions/EulerDiscretizer.hpp"
-#include "../../inc/Functions/Functions.hpp"
-#include "../../inc/Functions/VerletDiscretizer.hpp"
-#include "../../inc/Particle/Particle.hpp"
-#include "../../inc/Simulator/Simulator.hpp"
-#include "../../inc/System/System.hpp"
+#include "Exporter/Exporter.hpp"
+#include "Functions/EulerDiscretizer.hpp"
+#include "Functions/Functions.hpp"
+#include "Functions/VerletDiscretizer.hpp"
+#include "Particle/Particle.hpp"
+#include "Simulator/Simulator.hpp"
+#include "System/System.hpp"
 #include <iostream>
 
 int main(int argc, char *argv[]) {

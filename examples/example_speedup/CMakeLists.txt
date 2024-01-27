@@ -13,7 +13,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-add_compile_options(-I../../../inc -L../../../build -I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization -Ofast -funroll-all-loops)
+add_compile_options(-I../../../include -L../../../build -I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization -Ofast -funroll-all-loops)
 
 find_package(MPI REQUIRED)
 # openMPI
@@ -38,11 +38,11 @@ target_compile_options(Example PRIVATE ${OPENMP_FLAGS})
 target_compile_options(BHspeedup PRIVATE ${OPENMP_FLAGS})
 
 target_include_directories(Example PRIVATE 
-    ../../inc/
+    ../../include/
 )
 
 target_include_directories(BHspeedup PRIVATE 
-    ../../inc/
+    ../../include/
 )
 
 # target_link_libraries(Example NBodyEnvLibrary)
