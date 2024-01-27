@@ -6,6 +6,7 @@
 \usepackage[many]{tcolorbox}  
 \usepackage{listings}
 \usepackage{graphicx}
+\usepackage{hyperref}
 \usepackage{caption}
 \usepackage[sorting=none, style=nature]{biblatex}
 \addbibresource{references.bib}
@@ -27,7 +28,7 @@
 }
 
 \section{Abstract}
-This project is an N-body gravitational simulator designed to model the interactions between multiple celestial objects under the influence of gravity. It features the Barnes-Hut algorithm for superlinear complexity and a wide array of Runge-Kutta method for numerical integration used to compute body positions. The N-body problem is a classical problem in physics and astrodynamics that involves predicting the motions of a group of celestial bodies as they interact with each other through gravitational forces. \\
+This project is an N-body gravitational simulator designed to model the interactions between multiple celestial objects under the influence of gravity. It features the Barnes-Hut algorithm for pseudolinear complexity and a wide array of Runge-Kutta method for numerical integration used to compute body positions. The N-body problem is a classical problem in physics and astrodynamics that involves predicting the motions of a group of celestial bodies as they interact with each other through gravitational forces. The actual implementation can be found at this \href{https://github.com/AMSC22-23/N-Body-simulator}{github repository}. \\
 The N-body problem is a generalization of the two-body problem, where the gravitational interaction between multiple celestial objects is considered simultaneously. In the case of N bodies, each body exerts a gravitational force on every other body, resulting in a complex system of coupled differential equations. Solving these equations allows for the prediction of the positions and velocities of each body over time.
 
 \section{Analytical Considerations}
@@ -154,7 +155,7 @@ The following pseudo-code is intended for a two dimensional implementation, but 
 \subsection{Barnes-Hut Algorithm}
 In many astronomical scenarios, hierarchical structures exist, such as stars orbiting within galaxies or planets orbiting within a solar system. Hierarchical methods, like the Barnes-Hut algorithm, exploit this structure to reduce the computational complexity of the simulation. \\
 
-The Barnes-Hut simulation, named after Josh Barnes and Piet Hut, divides the three dimensional domain into cubic cells via an \textit{octree}, a particular kind of tree where each node has exactly eight children. It features an algorithm that recursively divides the n bodies into groups and stores them inside the octree. Each node, called octant, corresponds to a precise spacial region. The root od the tree represents the whole 3D domain, while its eight children correspond to the eight octants of the total volume. The whole space is recursively partitioned until each external node, also known as leaf, contains 0 or 1 particles. The denser the body distribution in a certain area, the greater the tree height corresponding to that spacial region. \\
+The Barnes-Hut simulation, named after Josh Barnes and Piet Hut, divides the three dimensional domain into cubic cells via an \textit{octree}, a particular kind of tree where each node has exactly eight children. It features an algorithm that recursively divides the n bodies into groups and stores them inside the octree. Each node, called octant, corresponds to a precise spacial region. The root of the tree represents the whole 3D domain, while its eight children correspond to the eight octants of the total volume. The whole space is recursively partitioned until each external node, also known as leaf, contains 0 or 1 particles. The denser the body distribution in a certain area, the greater the tree height corresponding to that spacial region. \\
 
 \begin{figure} [h]
     \centering
@@ -243,17 +244,102 @@ Function TreeNode::ComputeForce
 \end{verbatim}
 \end{boxA}
 
-\section{The N-Body-simulator Library}
-
-\section{How To Use}
-
+\newpage
 \section{Complexity Analysis}
 \subsection{Speedup tests}
 We performed several simulations to gather data about the speed up achieved with both parallel direct-sum algorithm and parallel Barnes-Hut algorithm. It should be noted that for large number of particles ($>$1000) we didn't run the sequential version, since it would have taken too much time. 
 All the tests were run on a machine with 8 cores AMD Ryzen 7 5700U CPU, 24GB of memory and a RTX 3050 Ti Nvidia GPU. The maximum number of available threads is 16.
 Moreover, all the tests excluded the operation of writing the results to a file through the \textbf{exporter} class, since this is intrinsically sequential. We made sure that were as few processes in the background as possible, in order to avoid polluting the results. \\
 \subsubsection{Sequential vs Parallel Direct-Sum} First we performed some small tests to assess the speedup between the sequential and OpenMP parallel versions of the direct-sum algorithm. For the latter we expect some performance loss due to the presence of atomic instructions that ensure the consistency of the force computation. In addition to that, all threads that have been spawned need to synchronize at the end of each parallel construct, since they all have an implicit barrier at their exiting point. \\
-For small tests, we ran the simulation multiple times to ensure that the results were consistent, so as to extract an average of the execution time and reduce the performance oscillations due to processes running in the background. \\
+For small tests, we ran the simulation multiple times to ensure that the results were consistent, so as to extract an average of the execution time and reduce the performance oscillations due to processes running in the background. The number of time steps of each simulation gets lower as the number of particles increases. The amount of time steps for small sets of bodies must be sufficiently high, otherwise the simulation is too short and results may be inaccurate. The time unit is \textit{milliseconds}. \\
+
+\begin{boxA}
+    \begin{verbatim}
+# 128 particles / 8000 time steps
+Average parallel execution time with 2 threads: 1065.8 
+Average parallel execution time with 4 threads: 728.6
+Average parallel execution time with 6 threads: 580.4
+Average parallel execution time with 8 threads: 523
+Average parallel execution time with 12 threads: 457.8
+Average parallel execution time with 16 threads: 496
+Average serial execution time: 910.8
+Average speed up with 2 threads: 0.85
+Average speed up with 4 threads: 1.25
+Average speed up with 6 threads: 1.57
+Average speed up with 8 threads: 1.741
+Average speed up with 12 threads: 1.99
+Average speed up with 16 threads: 1.83
+\end{verbatim}
+\end{boxA}
+
+\begin{boxA}
+    \begin{verbatim}
+# 512 / 2000 time steps
+Average parallel execution time with 2 threads: 3859.8
+Average parallel execution time with 4 threads: 2234.8
+Average parallel execution time with 6 threads: 1666
+Average parallel execution time with 8 threads: 1338.4
+Average parallel execution time with 12 threads: 1007.6
+Average parallel execution time with 16 threads: 937.8
+Average serial execution time: 3617
+Average speed up with 2 threads: 0.94
+Average speed up with 4 threads: 1.61
+Average speed up with 6 threads: 2.17
+Average speed up with 8 threads: 2.70
+Average speed up with 12 threads: 3.58
+Average speed up with 16 threads: 3.85
+\end{verbatim}
+\end{boxA}
+
+\begin{boxA}
+    \begin{verbatim}
+# 4096 particles / 100 time steps
+Average parallel execution time with 2 threads: 11886
+Average parallel execution time with 4 threads: 6333.6
+Average parallel execution time with 6 threads: 4577.4
+Average parallel execution time with 8 threads: 3544.6
+Average parallel execution time with 12 threads: 2568.8
+Average parallel execution time with 16 threads: 2176
+Average serial execution time: 11620.2
+Average speed up with 2 threads: 0.97
+Average speed up with 4 threads: 1.83
+Average speed up with 6 threads: 2.53
+Average speed up with 8 threads: 3.27
+Average speed up with 12 threads: 4.52
+Average speed up with 16 threads: 5.34
+\end{verbatim}
+\end{boxA}
+
+\begin{boxA}
+    \begin{verbatim}
+# 16,384 particles / 1 time step
+Average parallel execution time with 2 threads: 1938.8
+Average parallel execution time with 4 threads: 997.2
+Average parallel execution time with 6 threads: 683
+Average parallel execution time with 8 threads: 531.6
+Average parallel execution time with 12 threads: 384.6
+Average parallel execution time with 16 threads: 337.6
+Average serial execution time: 1873.6
+Average speed up with 2 threads: 0.96
+Average speed up with 4 threads: 1.87
+Average speed up with 6 threads: 2.74
+Average speed up with 8 threads: 3.52
+Average speed up with 12 threads: 4.87
+Average speed up with 16 threads: 5.54
+\end{verbatim}
+\end{boxA}
+
+Let us sum up and visualize the results on a plot to better understand the speedup trend with respect to the number of OpenMP threads. On the x axis we depict the number of working threads, while on the y axis we represent the corresponding speedup.All the plots that follow have been produced with a simple Python script. 
+
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=1\textwidth]
+    {images/serial_parallel_speedup.png}
+    \label{fig:execution_time}
+    % \caption*{Octree, each node has eight children}
+\end{figure}
+
+For a small number of bodies, we expect and actually obtain some performance degradation with a number of threads too high. This is due to the fact that each thread is assigned a workload too small with respect to the its creation and synchronization costs. For larger systems, we didn't manage to reach a degradation or even a plateau, since we have just 16 hardware threads at our disposal on the machine that runs the simulations. 
 
 \subsubsection{Direct-sum vs Barnes-Hut}
 Now we shall take into consideration the comparison between the parallel version of both direct-sum and Barnes-Hut algorithm. We expect the performance of the latter to get better for higher values of the multipole acceptance criterion, while the accuracy gets lower.In addition to that, Barnes-Hut performs better with an increasing number of particles. This is due to the fact that handling the octree has an intrinsic cost, which is well amortized when the body number is at least in the order of $10^4$.
@@ -264,29 +350,29 @@ Now a bigger test over a limited number of time steps, which are not really rele
 # 16384 particles / 3600 timesteps 
 Time taken by DS parallel execution: 1350 seconds
 Theta = 0.5 - Time taken by BH execution: 437 seconds
-Speedup: 3.0889
+Speedup: 3.09
 Theta = 0.7 - Time taken by BH execution: 286 seconds
-Speedup: 4.70757
+Speedup: 4.70
 Theta = 1 - Time taken by BH execution: 180 seconds
-Speedup: 7.4637
+Speedup: 7.46
 \end{verbatim}
 \end{boxA}
 
-We'd like to scale up the numbers even more, but we need to sacrifice the number of step simulations to be able to do that. Let us compare the speed up with the same number of particles, over just one time step. We obtain the following results: \\
+We'd like to scale up the numbers even more, but we need to sacrifice the number of step simulations to be able to do that. Let us compare the speed up with the same number of particles, over just one time step. We obtain the following results, which are frankly quite comforting: \\
 \begin{boxA}
 \begin{verbatim}
 # 16384 particles / 1 timesteps
 
-Average parallel execution time: 150 seconds
+Average parallel execution time: 150 milliseconds
 Average BH execution time for theta = 0.5: 49.4 milliseconds
-Average BH execution time for theta = 0.7: 29.8 seconds
-Average BH execution time for theta = 1.0: 20.6 seconds
-Average speed up with theta = 0.5: 3.03859
-Average speed up with theta = 0.7: 5.04868
-Average speed up with theta = 1.0: 7.2926
+Average BH execution time for theta = 0.7: 29.8 milliseconds
+Average BH execution time for theta = 1.0: 20.6 milliseconds
+Average speed up with theta = 0.5: 3.03
+Average speed up with theta = 0.7: 5.04
+Average speed up with theta = 1.0: 7.29
 \end{verbatim}
 \end{boxA}
-\noindent We can conclude that the number of time steps is approximately irrelevant for the evaluation of the performance enhancement. This allows us to simulate quite big systems even on a single machine. Let us simulate a number of bodies from $2^{15}$ to $2^{19}$ over just one step. 
+\noindent Note that the net execution time is not proportional since in the first case the computer wasn't connected to the power supply and was running the simulation with more processes in the background. This caused the former simulation to be slower at computing a single time step. All the following tests were performed with as little interference from other programs as possible. Nevertheless, we can conclude that the number of time steps is approximately irrelevant for the performance evaluation thanks to the speedup values, which are analogous in both cases.This allows us to simulate quite big systems even on a single machine. Let us simulate a number of bodies from $2^{15}$ to $2^{19}$ over just one step. 
 
 \begin{boxA}
     \begin{verbatim}
@@ -295,59 +381,76 @@ Average parallel execution time: 1324.4 milliseconds
 Average BH execution time for theta = 0.5: 367.4 milliseconds
 Average BH execution time for theta = 0.7: 209.4 milliseconds
 Average BH execution time for theta = 1.0: 142.4 milliseconds
-Average speed up with theta = 0.5: 3.68948
-Average speed up with theta = 0.7: 6.33065
-Average speed up with theta = 1.0: 9.31025
+Average speed up with theta = 0.5: 3.68
+Average speed up with theta = 0.7: 6.33
+Average speed up with theta = 1.0: 9.31
+\end{verbatim}
+\end{boxA}
 
+\begin{boxA}
+    \begin{verbatim}
 # 65536 particles / 1 timesteps
 Average parallel execution time: 10725.6 milliseconds
 Average BH execution time for theta = 0.5: 2058.2 milliseconds
 Average BH execution time for theta = 0.7: 1116 milliseconds
 Average BH execution time for theta = 1.0: 733.8 milliseconds
-Average speed up with theta = 0.5: 5.32422 
-Average speed up with theta = 0.7: 9.71832
-Average speed up with theta = 1.0: 14.6158
+Average speed up with theta = 0.5: 5.32
+Average speed up with theta = 0.7: 9.71
+Average speed up with theta = 1.0: 14.61
+\end{verbatim}
+\end{boxA}
 
+\begin{boxA}
+    \begin{verbatim}
 # 131072 particles / 1 timesteps
 Average parallel execution time: 30625.6 milliseconds
 Average BH execution time for theta = 0.5: 2496.6 milliseconds
 Average BH execution time for theta = 0.7: 1345.4 milliseconds
 Average BH execution time for theta = 1.0: 860.6 milliseconds
-Average speed up with theta = 0.5: 12.6555
-Average speed up with theta = 0.7: 22.9725
-Average speed up with theta = 1.0: 35.7798
+Average speed up with theta = 0.5: 12
+Average speed up with theta = 0.7: 22
+Average speed up with theta = 1.0: 35
+\end{verbatim}
+\end{boxA}
 
+\begin{boxA}
+    \begin{verbatim}
 # 262144 particles / 1 timesteps
 Average parallel execution time: 144.48 seconds
 Average BH execution time for theta = 0.5: 5.33 seconds
 Average BH execution time for theta = 0.7: 2.69 seconds
 Average BH execution time for theta = 1.0: 1.60 seconds
-Average speed up with theta = 0.5: 27.522
-Average speed up with theta = 0.7: 53.8476
-Average speed up with theta = 1.0: 91.5293
+Average speed up with theta = 0.5: 27
+Average speed up with theta = 0.7: 53
+Average speed up with theta = 1.0: 91
+\end{verbatim}
+\end{boxA}
 
+\begin{boxA}
+    \begin{verbatim}
 # 524288 particles / 1 timesteps
 Average parallel execution time: 851.8 seconds
 Average BH execution time for theta = 0.5: 12.4 seconds
 Average BH execution time for theta = 0.7: 6.4 seconds
 Average BH execution time for theta = 1.0: 3.7 seconds
-Average speed up with theta = 0.5: 68.8489
-Average speed up with theta = 0.7: 133.231
-Average speed up with theta = 1.0: 230.636
+Average speed up with theta = 0.5: 68
+Average speed up with theta = 0.7: 133
+Average speed up with theta = 1.0: 230
     \end{verbatim}
 \end{boxA}
 
-\newpage It can be clearly observed that the larger the number of bodies, the better the BH algorithm performs. This is to be expected since the complexity is \textit{quadratic} for DS and \textit{superlinear} for BH. The results can be summarized in the following plots. First we represent the execution time of the four different versions, namely direct-sum (DS), Barnes-Hut with $\theta = 0.5$ (BH05), $\theta = 0.7$ (BH07) and $\theta = 1.0$ (BH1). The number of particles is the same as above.  
+\noindent It can be clearly observed that the larger the number of bodies, the better the BH algorithm performs. This is to be expected since the complexity is \textit{quadratic} for DS and \textit{superlinear} for BH. The results can be summarized in the following plots. First we represent the execution time of the four different versions, namely direct-sum (DS), Barnes-Hut with $\theta = 0.5$ (BH05), $\theta = 0.7$ (BH07) and $\theta = 1.0$ (BH1). The increasing numbers of bodies are the same as above. \\
 
 \begin{figure} [h]
     \centering
     \includegraphics[width=1\textwidth]
-    {images/execution_time_DS_BH.png}
+    {images/BH_DS_comparison.png}
     \label{fig:execution_time}
     % \caption*{Octree, each node has eight children}
 \end{figure}
 
-\noindent Then a plot of the speedup of Barnes-Hut with respect to the direct-sum version, for different values of $\theta$ and an increasing number of particles.
+\noindent It can be easily noted that for large enough datasets, Barnes-Hut reduces the computation time by different orders of magnitude. This constitutes a huge improvement with respect to the initial parallel implementation. The plot confirms that the actual complexity is very close to the theoretical one, which has been traced on the graph.
+\noindent Then we shall produce a plot of the speedup of Barnes-Hut with respect to the direct-sum version, for different values of $\theta$ and increasing numbers of bodies.
 
 \begin{figure} [h]
     \centering
@@ -389,16 +492,16 @@ The visualization process in OpenFrameworks is quite straightforward.
 First the \textit{setup()} method initializes the OpenGL platform and creates a graphic window of the right dimensions.
 The \textit{update()} method is called at every step of the simulation and allows it to evolve over time. It eventually resets it once it reaches the end. The \textit{draw()} method is designated with the actual rendering of the bodies. It initializes the camera and extracts the positions of the particles at the current time step. Then it draws a spherical object for each body, colors it and scales it to the window dimensions. \\
 
-\noindent A screenshot of a simulation with 1024 randomly generated particles looks like this: 
+\newpage When it comes to producing a graphic visualization of a simulation, the numbers need to be contained. This is due to the cost of computing the evolution of the system over a large time span and the size of the output file. The following screenshot has been taken at time step 33,228 over a total of 86,400 during a simulation of 1024 particles. They were generated randomly and arranged in four cubic shapes. The clusters begin to spin and rotate clockwise until and progressively collide and merge with each other, producing nice visual effects. The full video of the simulation can be found \href{https://github.com/AMSC22-23/N-Body-simulator/tree/main/examples/example_OF}{here}. 
 
 \begin{figure} [h]
     \centering
     \includegraphics[width=1\textwidth]
-    {images/1024_part_sim.png}
+    {images/definitive_simulation.png}
     \label{fig:my_label}
 \end{figure}
 
-
+It can be noted that several particles are thrown outside the simulation due to gravitational slingshot phenomenon and instability in close quarters interactions. This is normal since the numerical integration methods that we implemented do not feature an adaptive time step, which would diminish divergence when the distance between bodies tends to zero. Nevertheless, the result is quite satisfactory.
 
 \newpage
 \printbibliography

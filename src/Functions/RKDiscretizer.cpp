@@ -179,7 +179,7 @@ namespace NBodyEnv{
     void RKDiscretizer::discretize(Particle &target, Particle &particleOne, Particle &particleTwo, std::function<Force(Pos &, Pos &, double, double, double, double)> func, double deltaTime){
         
         Pos tempPos;
-        Force force = {0.0, 0.0, 0.0};
+        // Force force = {0.0, 0.0, 0.0};
         std::vector<Vel> k;
         Vel kSum;
         // Final vel
