@@ -1,11 +1,4 @@
-#include "Exporter/Exporter.hpp"
-#include "Functions/EulerDiscretizer.hpp"
-#include "Functions/Functions.hpp"
-#include "Functions/VerletDiscretizer.hpp"
-#include "Particle/Particle.hpp"
-#include "Simulator/Simulator.hpp"
-#include "System/System.hpp"
-#include "TreeNode/TreeNode.hpp"
+#include <N-Body-sim.hpp>
 #include <omp.h>
 #include <iostream>
 #include <random>
@@ -23,8 +16,8 @@ int main(int argc, char *argv[])
     NBodyEnv::System<NBodyEnv::VerletDiscretizer> systemBH(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
     // NBodyEnv::System<NBodyEnv::VerletDiscretizer> serialSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
 
-    constexpr int numParticles = 2048;
-    constexpr int timesteps = 3600 * 7;
+    // constexpr int numParticles = 2048;
+    // constexpr int timesteps = 3600 * 7;
     // constexpr int timesteps = 360;
 
     // Create exporter
@@ -47,162 +40,127 @@ int main(int argc, char *argv[])
 
     NBodyEnv::TreeNode root(NBodyEnv::TreeNode(max, min, nullptr));
 
-    // Create and add test particles
-        for (int i = 0; i < numParticles; i++)
-        {
-            NBodyEnv::Particle particle(
-                NBodyEnv::gravitational,
-                {distr(gen), distr(gen), distr(gen)},
-                {0.0, 0.0, 0.0}, massDistr(gen), 40);
-            renderSystem.addParticle(particle);
-        }
+    // PERFORMANCE TESTING FOR SPEED UP EVALUATION
+    constexpr int numParticles_sim = 32768;
+    constexpr int timesteps_sim = 1;
+    constexpr int num_sim = 5;
 
-    #if defined(_OPENMP)
-        omp_set_num_threads(16);
-    #endif
+#if defined(_OPENMP)
+    omp_set_num_threads(16);
+#endif
 
-        // SIMULATE SYSTEM FOR RENDERING
-        for (int i = 0; i < timesteps; i++)
+    for (int i = 0; i < numParticles_sim; i++)
+    {
+        NBodyEnv::Particle particle(
+            NBodyEnv::gravitational,
+            {distr(gen), distr(gen), distr(gen)},
+            {0.0, 0.0, 0.0}, massDistr(gen), 40);
+        system.addParticle(particle);
+        systemBH.addParticle(particle);
+    }
+
+    milliseconds durationsDS[num_sim];
+    milliseconds durationsBH05[num_sim];
+    milliseconds durationsBH07[num_sim];
+    milliseconds durationsBH10[num_sim];
+
+    std::vector<double> theta_vec = {0.5, 0.7, 1.0};
+
+    for (int k = 0; k < num_sim; ++k)
+    {
+        auto start = high_resolution_clock::now();
+        for (int i = 0; i < timesteps_sim; i++)
         {
             // compute with direct-sum algorithm
-            renderSystem.compute();
-            if (i % 15 == 0)
-            {
-                exporter.saveState(renderSystem.getParticles());
-            }
+            system.compute();
+            // if (i % 3 == 0)
+            // {
+            //     exporter.saveState(system.getParticles());
+            // }
         }
 
-        exporter.close();
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    // PERFORMANCE TESTING FOR SPEED UP EVALUATION
-//     constexpr int numParticles_sim = 32768*2*2*2*2;
-//     constexpr int timesteps_sim = 1;
-//     constexpr int num_sim = 5;
+        auto stop = high_resolution_clock::now();
 
-// #if defined(_OPENMP)
-//     omp_set_num_threads(16);
-// #endif
+        // Get duration. Substart timepoints to
+        // get duration. To cast it to proper unit
+        // use duration cast method
+        auto durationDSparallel = duration_cast<milliseconds>(stop - start);
+        durationsDS[k] = durationDSparallel;
 
-//     for (int i = 0; i < numParticles_sim; i++)
-//     {
-//         NBodyEnv::Particle particle(
-//             NBodyEnv::gravitational,
-//             {distr(gen), distr(gen), distr(gen)},
-//             {0.0, 0.0, 0.0}, massDistr(gen), 40);
-//         system.addParticle(particle);
-//         systemBH.addParticle(particle);
-//     }
+        std::cout << "Time taken by parallel execution: "
+                  << durationDSparallel.count() << " milliseconds" << std::endl;
 
-//     milliseconds durationsDS[num_sim];
-//     milliseconds durationsBH05[num_sim];
-//     milliseconds durationsBH07[num_sim];
-//     milliseconds durationsBH10[num_sim];
+        // std::cout << "DS speedup w.r.t serial: " << (double)durationDSserial.count() / (double)durationDSparallel.count() << std::endl;
+        // loop over all theta values and simulate the system
+        for (size_t i = 0; i < theta_vec.size(); i++)
+        {
+            root.SetTheta(theta_vec[i]);
+            auto start = high_resolution_clock::now();
+            for (int j = 0; j < timesteps_sim; j++)
+            {
+                // compute with Barnes-Hut algorithm
+                systemBH.computeBH();
+                // if(i % 36 == 0)
+                // {
+                //     exporterBH.saveState(systemBH.getParticles());
+                // }
+            }
 
-//     std::vector<double> theta_vec = {0.5, 0.7, 1.0};
+            auto stop = high_resolution_clock::now();
 
-//     for (int k = 0; k < num_sim; ++k)
-//     {
-//         auto start = high_resolution_clock::now();
-//         for (int i = 0; i < timesteps_sim; i++)
-//         {
-//             // compute with direct-sum algorithm
-//             system.compute();
-//             // if (i % 3 == 0)
-//             // {
-//             //     exporter.saveState(system.getParticles());
-//             // }
-//         }
+            // Get duration. Substart timepoints to
+            // get duration. To cast it to proper unit
+            // use duration cast method
+            auto durationBH = duration_cast<milliseconds>(stop - start);
 
-//         auto stop = high_resolution_clock::now();
+            if (theta_vec[i] == 0.5)
+            {
+                durationsBH05[k] = durationBH;
+            }
+            else if (theta_vec[i] == 0.7)
+            {
+                durationsBH07[k] = durationBH;
+            }
+            else if (theta_vec[i] == 1.0)
+            {
+                durationsBH10[k] = durationBH;
+            }
 
-//         // Get duration. Substart timepoints to
-//         // get duration. To cast it to proper unit
-//         // use duration cast method
-//         auto durationDSparallel = duration_cast<milliseconds>(stop - start);
-//         durationsDS[k] = durationDSparallel;
+            // std::cout << "Theta = " << root.GetTheta() << " - Time taken by BH execution: "
+            //           << durationBH.count() << " milliseconds" << std::endl;
 
-//         std::cout << "Time taken by parallel execution: "
-//                   << durationDSparallel.count() << " milliseconds" << std::endl;
+            // print speedup between direct-sum DS and Barnes-Hut BH algorithm
+            // std::cout << "BH speedup w.r.t serial: " << (double)durationDSserial.count() / (double)durationBH.count() << std::endl;
+            // std::cout << "BH speedup w.r.t parallel: " << (double)durationDSparallel.count() / (double)durationBH.count() << std::endl;
+        }
+    }
 
-//         // std::cout << "DS speedup w.r.t serial: " << (double)durationDSserial.count() / (double)durationDSparallel.count() << std::endl;
-//         // loop over all theta values and simulate the system
-//         for (size_t i = 0; i < theta_vec.size(); i++)
-//         {
-//             root.SetTheta(theta_vec[i]);
-//             auto start = high_resolution_clock::now();
-//             for (int j = 0; j < timesteps_sim; j++)
-//             {
-//                 // compute with Barnes-Hut algorithm
-//                 systemBH.computeBH();
-//                 // if(i % 36 == 0)
-//                 // {
-//                 //     exporterBH.saveState(systemBH.getParticles());
-//                 // }
-//             }
+    double totParallelTime = 0.0;
+    double averageSpeedUp05 = 0.0;
+    double averageSpeedUp07 = 0.0;
+    double averageSpeedUp10 = 0.0;
+    double totTime05 = 0.0;
+    double totTime07 = 0.0;
+    double totTime10 = 0.0;
+    for (size_t i = 0; i < num_sim; i++)
+    {
+        averageSpeedUp05 += (double)durationsDS[i].count() / (double)durationsBH05[i].count();
+        averageSpeedUp07 += (double)durationsDS[i].count() / (double)durationsBH07[i].count();
+        averageSpeedUp10 += (double)durationsDS[i].count() / (double)durationsBH10[i].count();
+        totTime05 += (double)durationsBH05[i].count();
+        totTime07 += (double)durationsBH07[i].count();
+        totTime10 += (double)durationsBH10[i].count();
+        totParallelTime += (double)durationsDS[i].count();
+    }
 
-//             auto stop = high_resolution_clock::now();
+    // print the average parallel execution time
+    std::cout << "Average parallel execution time: " << totParallelTime / (double)num_sim << std::endl;
+    std::cout << "Average BH execution time for theta = 0.5: " << totTime05 / (double)num_sim << std::endl;
+    std::cout << "Average BH execution time for theta = 0.7: " << totTime07 / (double)num_sim << std::endl;
+    std::cout << "Average BH execution time for theta = 1.0: " << totTime10 / (double)num_sim << std::endl;
 
-//             // Get duration. Substart timepoints to
-//             // get duration. To cast it to proper unit
-//             // use duration cast method
-//             auto durationBH = duration_cast<milliseconds>(stop - start);
-
-//             if (theta_vec[i] == 0.5)
-//             {
-//                 durationsBH05[k] = durationBH;
-//             }
-//             else if (theta_vec[i] == 0.7)
-//             {
-//                 durationsBH07[k] = durationBH;
-//             }
-//             else if (theta_vec[i] == 1.0)
-//             {
-//                 durationsBH10[k] = durationBH;
-//             }
-
-//             // std::cout << "Theta = " << root.GetTheta() << " - Time taken by BH execution: "
-//             //           << durationBH.count() << " milliseconds" << std::endl;
-
-//             // print speedup between direct-sum DS and Barnes-Hut BH algorithm
-//             // std::cout << "BH speedup w.r.t serial: " << (double)durationDSserial.count() / (double)durationBH.count() << std::endl;
-//             // std::cout << "BH speedup w.r.t parallel: " << (double)durationDSparallel.count() / (double)durationBH.count() << std::endl;
-//         }
-//     }
-
-//     double totParallelTime = 0.0;
-//     double averageSpeedUp05 = 0.0;
-//     double averageSpeedUp07 = 0.0;
-//     double averageSpeedUp10 = 0.0;
-//     double totTime05 = 0.0;
-//     double totTime07 = 0.0;
-//     double totTime10 = 0.0;
-//     for (size_t i = 0; i < num_sim; i++)
-//     {
-//         averageSpeedUp05 += (double)durationsDS[i].count() / (double)durationsBH05[i].count();
-//         averageSpeedUp07 += (double)durationsDS[i].count() / (double)durationsBH07[i].count();
-//         averageSpeedUp10 += (double)durationsDS[i].count() / (double)durationsBH10[i].count();
-//         totTime05 += (double)durationsBH05[i].count();
-//         totTime07 += (double)durationsBH07[i].count();
-//         totTime10 += (double)durationsBH10[i].count();
-//         totParallelTime += (double)durationsDS[i].count();
-//     }
-
-//     // print the average parallel execution time
-//     std::cout << "Average parallel execution time: " << totParallelTime / (double)num_sim << std::endl;
-//     std::cout << "Average BH execution time for theta = 0.5: " << totTime05 / (double)num_sim << std::endl;
-//     std::cout << "Average BH execution time for theta = 0.7: " << totTime07 / (double)num_sim << std::endl;
-//     std::cout << "Average BH execution time for theta = 1.0: " << totTime10 / (double)num_sim << std::endl;
-
-//     std::cout << "Average speed up with theta = 0.5: " << averageSpeedUp05 / (double)num_sim << std::endl;
-//     std::cout << "Average speed up with theta = 0.7: " << averageSpeedUp07 / (double)num_sim << std::endl;
-//     std::cout << "Average speed up with theta = 1.0: " << averageSpeedUp10 / (double)num_sim << std::endl;
+    std::cout << "Average speed up with theta = 0.5: " << averageSpeedUp05 / (double)num_sim << std::endl;
+    std::cout << "Average speed up with theta = 0.7: " << averageSpeedUp07 / (double)num_sim << std::endl;
+    std::cout << "Average speed up with theta = 1.0: " << averageSpeedUp10 / (double)num_sim << std::endl;
     return 0;
 }

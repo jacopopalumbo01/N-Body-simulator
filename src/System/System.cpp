@@ -51,38 +51,6 @@ namespace NBodyEnv
     // boolean flag to make sure particle is updated in case all others have been absorbed
     bool updated = false;
 
-    // OLD IMPLEMENTATION, CAUSED RACE CONDITIONS probably due to the fact that
-    // inner loop starts from value i, which depends on the outer loop and is not thread safe
-    //
-    // #if defined(_OPENMP)
-    // #pragma omp parallel for private(updated) schedule(static)
-    // #endif
-    //     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
-    //     {
-    //       // if (!_systemParticles[i].getVisible())
-    //       //   continue;
-    //       // updated = false;
-
-    //       for (long unsigned int j = i + 1; j < _systemParticles.size(); ++j)
-    //       {
-    //         // if (!_systemParticles[j].getVisible())
-    //         //   continue;
-    //         _systemParticles[i].computeForce(_systemParticles[j], _func);
-    //         // updated = true;
-    //       }
-
-    //       // if (!updated)
-    //       // {
-    //       //   // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
-    //       //   // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
-    //       //   NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
-    //       //                                    {0.0, 0.0, 0.0}, 0, 0);
-    //       //   _systemParticles[i].computeForce(ghostParticle, _func);
-    //       //   // should use a break here, but it's not possible in openmp
-    //       //   continue;
-    //       // }
-    //     }
-
 #if defined(_OPENMP)
 #pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
 #endif
@@ -307,6 +275,11 @@ namespace NBodyEnv
          iter++)
     {
       iter->setForce({0.0, 0.0, 0.0});
+    }
+
+    for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
+         iter++)
+    {
       m_root.InsertParticle(*iter, 0);
     }
 
@@ -351,8 +324,7 @@ namespace NBodyEnv
     {
       m_root.InsertParticle(*iter, 0);
     }
-
-
+    
     m_root.ComputeMass();
 
 #if defined(_OPENMP)

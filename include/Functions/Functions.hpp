@@ -16,6 +16,13 @@ namespace NBodyEnv
     {
       return getGrav;
     }
+    // serial version, which avoids redundant computations
+    static void getGravSerial(Particle &p1, Particle &p2);
+    static std::function<void(Particle &, Particle &)> getGravSerialFunc()
+    {
+      return getGravSerial;
+    }
+    // MPI version
     static Force getGravTwo(Pos &, Pos &, double, double, double, double);
     static std::function<Force(Pos &, Pos &, double, double, double, double)> getGravFunction()
     {
