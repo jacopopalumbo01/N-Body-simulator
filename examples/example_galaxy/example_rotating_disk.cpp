@@ -11,12 +11,7 @@ int main(int argc, char *argv[])
     NBodyEnv::System<NBodyEnv::EulerDiscretizer> system(NBodyEnv::Functions::getGravFunc(), NBodyEnv::EulerDiscretizer(), 1);
 
     constexpr int numParticles = 1024;
-    // constexpr int numParticles = 32;
-    // time steps of cool and very_cool tests
-    // constexpr int timeSteps = 3600*24;
     constexpr int timeSteps = 3600*24;
-    // constexpr int timeSteps = 3600;
-
 
     // obtain a random number from hardware
     std::random_device rand;
@@ -33,19 +28,17 @@ int main(int argc, char *argv[])
         NBodyEnv::Particle particle(
             NBodyEnv::gravitational,
             {3e3 + distr(gen), 3e3 + distr(gen), distr(gen)},
-            {0, -3e-1, 0.0}, massDistr(gen), 50);
+            {0, -1, 0.0}, massDistr(gen), 50);
         system.addParticle(particle);
     }
 
-    // print all velocity components of the first particle
-    // std::cout << "Velocity: " << system.getParticles()[0].getVel().xVel << " " << system.getParticles()[0].getVel().yVel << " " << system.getParticles()[0].getVel().zVel << std::endl;
     // Create left upper cluster
     for (int i = 0; i < numParticles/4; i++)
     {
         NBodyEnv::Particle particle(
             NBodyEnv::gravitational,
             {-3e3 + distr(gen), 3e3 + distr(gen), distr(gen)},
-            {3e-1, 0, 0.0}, massDistr(gen), 50);
+            {1, 0, 0.0}, massDistr(gen), 50);
         system.addParticle(particle);
     }
 
@@ -55,30 +48,29 @@ int main(int argc, char *argv[])
         NBodyEnv::Particle particle(
             NBodyEnv::gravitational,
             {-3e3 + distr(gen), -3e3 + distr(gen), distr(gen)},
-            {0, 3e-1, 0.0}, massDistr(gen), 50);
+            {0, 1, 0.0}, massDistr(gen), 50);
         system.addParticle(particle);
     }
-    
+
     // Create right lower cluster
     for (int i = 0; i < numParticles/4; i++)
     {
         NBodyEnv::Particle particle(
             NBodyEnv::gravitational,
             {3e3 + distr(gen), -3e3 + distr(gen), distr(gen)},
-            {-3e-1, 0, 0.0}, massDistr(gen), 50);
+            {-1, 0, 0.0}, massDistr(gen), 50);
         system.addParticle(particle);
     }
 
-    // NBodyEnv::Particle particle(
-    //         NBodyEnv::gravitational,
-    //         {0.0, 0.0, 0.0},
-    //         {0.0, 0.0, 0.0}, 1e15, 50);
+    NBodyEnv::Particle particle(
+            NBodyEnv::gravitational,
+            {0.0, 0.0, 0.0},
+            {0.0, 0.0, 0.0}, 5e13, 100);
 
-    // system.addParticle(particle);
+    system.addParticle(particle);
 
     // Create exporter
     NBodyEnv::Exporter exporter("test.part", 1);
-    // NBodyEnv::Exporter serialExporter("serialTest.part", 1);
 
 // set number of threads
 #if defined(_OPENMP)

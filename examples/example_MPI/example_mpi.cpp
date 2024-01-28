@@ -1,18 +1,17 @@
-#include <iostream>
 #include <N-Body-sim.hpp>
+#include <iostream>
 #include <random>
 #include <omp.h>
 
-
-int main() {
+int main()
+{
     NBodyEnv::RKDiscretizer rkOne = NBodyEnv::RKDiscretizer(DISC_RK4);
     NBodyEnv::RKDiscretizer rkTwo = NBodyEnv::RKDiscretizer(DISC_BEULER);
 
     NBodyEnv::System system(NBodyEnv::Functions::getGravFunc(), rkOne, 10.0);
     NBodyEnv::System systemTwo(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 10.0);
 
-
-    constexpr int numParticles = 32;
+    constexpr int numParticles = 128;
 
     // obtain a random number from hardware
     std::random_device rand;
@@ -22,7 +21,6 @@ int main() {
     std::uniform_real_distribution<> distr(-10000.0, 10000.0);
     // define the range for particle masses
     std::uniform_real_distribution<> massDistr(1.0e10, 1.0e11);
-
 
     // Create and add test particles
     for (int i = 0; i < numParticles; i++)
@@ -38,12 +36,11 @@ int main() {
     NBodyEnv::Exporter exporter("testMPI.part", 1);
     NBodyEnv::Exporter exporterTwo("test.part", 1);
 
-    
-    // MPI version
-    // set number of threads
-    #if defined(_OPENMP)
-        omp_set_num_threads(1);
-    #endif // _OPENMP
+// MPI version
+// set number of threads
+#if defined(_OPENMP)
+    omp_set_num_threads(2);
+#endif // _OPENMP
 
     // Initialize the MPI environment
     MPI_Init(NULL, NULL);
@@ -56,11 +53,17 @@ int main() {
     int world_rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-    std::cout << "Computing with mpi. Number of nodes: " << world_size << std::endl;
+    if (world_rank == 0)
+    {
+        std::cout << "Computing with mpi-openMP hybrid. Number of nodes: " << world_size << std::endl;
+#if defined(_OPENMP)
+        std::cout << "Number of threads: " << omp_get_max_threads() << std::endl;
+#endif // _OPENMP
+    }
 
     for (int i = 0; i < 1000; i++)
     {
-        if(world_rank == 0 && i % 100 == 0) // Only master exports
+        if (world_rank == 0 && i % 100 == 0) // Only master exports
             exporter.saveState(system.getParticles());
 
         system.computeMPI();
@@ -68,13 +71,13 @@ int main() {
     }
 
     exporter.close();
-    
 
-    if (world_rank == 0){
+    if (world_rank == 0)
+    {
         // Classic version
         for (int i = 0; i < 1000; i++)
         {
-            if(i % 100 == 0)
+            if (i % 100 == 0)
                 exporterTwo.saveState(systemTwo.getParticles());
             systemTwo.compute();
         }

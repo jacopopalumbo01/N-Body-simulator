@@ -51,38 +51,6 @@ namespace NBodyEnv
     // boolean flag to make sure particle is updated in case all others have been absorbed
     bool updated = false;
 
-    // OLD IMPLEMENTATION, CAUSED RACE CONDITIONS probably due to the fact that
-    // inner loop starts from value i, which depends on the outer loop and is not thread safe
-    //
-    // #if defined(_OPENMP)
-    // #pragma omp parallel for private(updated) schedule(static)
-    // #endif
-    //     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
-    //     {
-    //       // if (!_systemParticles[i].getVisible())
-    //       //   continue;
-    //       // updated = false;
-
-    //       for (long unsigned int j = i + 1; j < _systemParticles.size(); ++j)
-    //       {
-    //         // if (!_systemParticles[j].getVisible())
-    //         //   continue;
-    //         _systemParticles[i].computeForce(_systemParticles[j], _func);
-    //         // updated = true;
-    //       }
-
-    //       // if (!updated)
-    //       // {
-    //       //   // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
-    //       //   // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
-    //       //   NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
-    //       //                                    {0.0, 0.0, 0.0}, 0, 0);
-    //       //   _systemParticles[i].computeForce(ghostParticle, _func);
-    //       //   // should use a break here, but it's not possible in openmp
-    //       //   continue;
-    //       // }
-    //     }
-
 #if defined(_OPENMP)
 #pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
 #endif
@@ -137,63 +105,13 @@ namespace NBodyEnv
       iter->setForce({0.0, 0.0, 0.0});
     }
 
-    // boolean flag to make sure particle is updated in case all others have been absorbed
-    bool updated = false;
-
-    // OLD IMPLEMENTATION, CAUSED RACE CONDITIONS probably due to the fact that
-    // inner loop starts from value i, which depends on the outer loop and is not thread safe
-
         for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
         {
-          // if (!_systemParticles[i].getVisible())
-          //   continue;
-          // updated = false;
-
           for (long unsigned int j = i + 1; j < _systemParticles.size(); ++j)
           {
-            // if (!_systemParticles[j].getVisible())
-            //   continue;
             _systemParticles[i].computeForce(_systemParticles[j], _func);
-            // updated = true;
           }
-
-          // if (!updated)
-          // {
-          //   // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
-          //   // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
-          //   NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
-          //                                    {0.0, 0.0, 0.0}, 0, 0);
-          //   _systemParticles[i].computeForce(ghostParticle, _func);
-          //   // should use a break here, but it's not possible in openmp
-          //   continue;
-          // }
         }
-
-    // for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
-    // {
-    //   if (!_systemParticles[i].getVisible())
-    //     continue;
-    //   updated = false;
-
-    //   for (long unsigned int j = 0; j < _systemParticles.size(); ++j)
-    //   {
-    //     if (!_systemParticles[j].getVisible())
-    //       continue;
-    //     _systemParticles[i].computeForce(_systemParticles[j], _func);
-    //     updated = true;
-    //   }
-
-    //   if (!updated)
-    //   {
-    //     // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
-    //     // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
-    //     NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
-    //                                      {0.0, 0.0, 0.0}, 0, 0);
-    //     _systemParticles[i].computeForce(ghostParticle, _func);
-    //     // should use a break here, but it's not possible in openmp
-    //     continue;
-    //   }
-    // }
 
     // need to decouple the update of the position and velocity from the
     // computation of the forces, for unknown reasons
@@ -242,42 +160,10 @@ namespace NBodyEnv
          iter++)
     {
       iter->setForce({0.0, 0.0, 0.0});
-      // std::cout << "Number of threads: " << omp_get_num_threads() << "\n";
     }
 
     // boolean flag to make sure particle is updated in case all others have been absorbed
     bool updated = false;
-
-    // OLD IMPLEMENTATION, CAUSED RACE CONDITIONS probably due to the fact that
-    // inner loop starts from value i, which depends on the outer loop and is not thread safe
-    //
-    // #if defined(_OPENMP)
-    // #pragma omp parallel for private(updated) schedule(static)
-    // #endif
-    //     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
-    //     {
-    //       if (!_systemParticles[i].getVisible())
-    //         continue;
-    //       updated = false;
-    //       for (long unsigned int j = i + 1; j < _systemParticles.size(); ++j)
-    //       {
-    //         if (!_systemParticles[j].getVisible())
-    //           continue;
-    //         _systemParticles[i].computeForce(_systemParticles[j], _func);
-    //         updated = true;
-    //       }
-
-    //       // if (!updated)
-    //       // {
-    //       //   // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
-    //       //   // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
-    //       //   NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
-    //       //                                    {0.0, 0.0, 0.0}, 0, 0);
-    //       //   _systemParticles[i].computeForce(ghostParticle, _func);
-    //       //   // should use a break here, but it's not possible in openmp
-    //       //   continue;
-    //       // }
-    //     }
 
 #if defined(_OPENMP)
 #pragma omp parallel for private(updated) schedule(static)
@@ -334,9 +220,6 @@ namespace NBodyEnv
   template <>
   void System<VerletDiscretizer>::computeSerial()
   {
-    // set number of threads
-    // omp_set_num_threads(2);
-
     // Save current state in a temp vector
     std::vector<NBodyEnv::Particle> tempState(_systemParticles);
 
@@ -345,68 +228,19 @@ namespace NBodyEnv
          iter++)
     {
       iter->setForce({0.0, 0.0, 0.0});
-      // std::cout << "Number of threads: " << omp_get_num_threads() << "\n";
     }
 
-    // boolean flag to make sure particle is updated in case all others have been absorbed
-    bool updated = false;
-
-    // OLD IMPLEMENTATION, CAUSED RACE CONDITIONS probably due to the fact that
-    // inner loop starts from value i, which depends on the outer loop and is not thread safe
-    //
         for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
         {
           if (!_systemParticles[i].getVisible())
             continue;
-          updated = false;
           for (long unsigned int j = i + 1; j < _systemParticles.size(); ++j)
           {
             if (!_systemParticles[j].getVisible())
               continue;
             _systemParticles[i].computeForce(_systemParticles[j], _func);
-            updated = true;
           }
-
-          // if (!updated)
-          // {
-          //   // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
-          //   // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
-          //   NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
-          //                                    {0.0, 0.0, 0.0}, 0, 0);
-          //   _systemParticles[i].computeForce(ghostParticle, _func);
-          //   // should use a break here, but it's not possible in openmp
-          //   continue;
-          // }
         }
-
-// #if defined(_OPENMP)
-// #pragma omp parallel for private(updated) schedule(static)
-// #endif
-//     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
-//     {
-//       if (!_systemParticles[i].getVisible())
-//         continue;
-//       updated = false;
-
-//       for (long unsigned int j = 0; j < _systemParticles.size(); ++j)
-//       {
-//         if (!_systemParticles[j].getVisible())
-//           continue;
-//         _systemParticles[i].computeForce(_systemParticles[j], _func);
-//         updated = true;
-//       }
-
-//       if (!updated)
-//       {
-//         // all particles have been absorbed by p1, therefore they are not visible ==> the computeForce method in the loop
-//         // above has not been called, and the force on p1 has not been updated ==> we need to update it here with a ghostParticle
-//         NBodyEnv::Particle ghostParticle(NBodyEnv::gravitational, {0.0, 0.0, 0.0},
-//                                          {0.0, 0.0, 0.0}, 0, 0);
-//         _systemParticles[i].computeForce(ghostParticle, _func);
-//         // should use a break here, but it's not possible in openmp
-//         continue;
-//       }
-//     }
 
     // need to decouple the update of the position and velocity from the
     // computation of the forces, for unknown reasons
@@ -441,17 +275,21 @@ namespace NBodyEnv
          iter++)
     {
       iter->setForce({0.0, 0.0, 0.0});
+    }
+
+    for (auto iter = _systemParticles.begin(); iter != _systemParticles.end();
+         iter++)
+    {
       m_root.InsertParticle(*iter, 0);
     }
 
     m_root.ComputeMass();
 
 #if defined(_OPENMP)
-#pragma omp parallel for schedule(static) /*collapse(2)*/
+#pragma omp parallel for schedule(static)
 #endif
     for (int i = 0; i < m_root.GetNParticles(); ++i)
     {
-      // std::cout << "Computing force for particle " << i << std::endl;
       std::vector<double> force = m_root.ComputeForce(_systemParticles[i]);
     }
 
@@ -486,16 +324,14 @@ namespace NBodyEnv
     {
       m_root.InsertParticle(*iter, 0);
     }
-
-
+    
     m_root.ComputeMass();
 
 #if defined(_OPENMP)
-#pragma omp parallel for schedule(static) /*collapse(2)*/
+#pragma omp parallel for schedule(static) 
 #endif
     for (int i = 0; i < m_root.GetNParticles(); ++i)
     {
-      // std::cout << "Computing force for particle " << i << std::endl;
       std::vector<double> force = m_root.ComputeForce(_systemParticles[i]);
     }
 
@@ -560,7 +396,7 @@ namespace NBodyEnv
     bool updated = false;
 
 #if defined(_OPENMP)
-#pragma omp parallel for private(updated) schedule(static) /*collapse(2)*/
+#pragma omp parallel for private(updated) schedule(static) 
 #endif
     for (long unsigned int i = 0; i < _systemParticles.size(); ++i)
     {
@@ -673,7 +509,7 @@ namespace NBodyEnv
           endVec = _systemParticles.size() - 1;
         
         // Update 
-        for(int j = initVec; j <= endVec; j++)
+        for(size_t j = initVec; j <= endVec; j++)
           _systemParticles[j] = temp[j - initVec];
         
 

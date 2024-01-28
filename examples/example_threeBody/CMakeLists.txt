@@ -13,7 +13,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-set(HEADER_DIR ../../inc)
+set(HEADER_DIR ../../include)
 set(HEADER_FILES
     Particle/Particle.hpp
     System/System.hpp
@@ -68,15 +68,15 @@ add_executable(ThreeBodySim
 )
 
 target_include_directories(Example PRIVATE 
-    ../../inc/
+    ../../include/
 )
 
 target_include_directories(NBodyEnvLibrary PRIVATE 
-    ../../inc/
+    ../../include/
 )
 
 target_include_directories(ThreeBodySim PRIVATE 
-    ../../inc/
+    ../../include/
 )
 
 

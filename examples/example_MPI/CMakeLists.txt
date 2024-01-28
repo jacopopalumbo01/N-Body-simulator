@@ -13,7 +13,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-add_compile_options(-I../../../inc -L../../../build -ln-body-sim -I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization)
+add_compile_options(-I../../../include -L../../../build -ln-body-sim -I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization)
 
 find_package(OpenMP REQUIRED)
 if(OpenMP_CXX_FOUND)

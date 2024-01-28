@@ -1,5 +1,5 @@
-#include <iostream>
 #include <N-Body-sim.hpp>
+#include <iostream>
 #include <random>
 #include <chrono>
 #include <omp.h>
@@ -11,10 +11,11 @@ int main()
     NBodyEnv::RKDiscretizer rkOne = NBodyEnv::RKDiscretizer(DISC_FEULER);
     NBodyEnv::RKDiscretizer rkTwo = NBodyEnv::RKDiscretizer(DISC_BEULER);
 
-    NBodyEnv::System system(NBodyEnv::Functions::getGravFunc(), rkOne, 10.0);
-    NBodyEnv::System systemTwo(NBodyEnv::Functions::getGravFunc(), NBodyEnv::EulerDiscretizer(), 10.0);
+    // NBodyEnv::System system(NBodyEnv::Functions::getGravFunc(), rkOne, 10.0);
+    NBodyEnv::System systemSerial(NBodyEnv::Functions::getGravFunc(), NBodyEnv::EulerDiscretizer(), 1.0);
+    NBodyEnv::System system(NBodyEnv::Functions::getGravFunc(), rkOne, 1.0);
 
-    constexpr int numParticles = 16;
+    constexpr int numParticles = 256;
 
     // obtain a random number from hardware
     std::random_device rand;
@@ -33,7 +34,7 @@ int main()
             {distr(gen), distr(gen), distr(gen)},
             {0.0, 0.0, 0.0}, massDistr(gen), 15);
         system.addParticle(particle);
-        systemTwo.addParticle(particle);
+        systemSerial.addParticle(particle);
     }
 
     NBodyEnv::Exporter exporter("testMPI.part", 1);
@@ -41,7 +42,7 @@ int main()
 
     // set number of threads
 #if defined(_OPENMP)
-    omp_set_num_threads(1);
+    omp_set_num_threads(8);
 #endif // _OPENMP
 
     // MPI version
@@ -58,18 +59,19 @@ int main()
 
     if (world_rank == 0)
     {
-        std::cout << "Number of OpenMP threads: " << omp_get_max_threads() << std::endl;
-        std::cout << "Computing with MPI. Number of nodes: " << world_size << std::endl;
+        std::cout << "Computing with mpi-openMP hybrid. Number of nodes: " << world_size << std::endl;
+#if defined(_OPENMP)
+        std::cout << "Number of threads: " << omp_get_max_threads() << std::endl;
+#endif // _OPENMP
     }
 
     auto start = high_resolution_clock::now();
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 100; i++)
     {
-        if (world_rank == 0) // Only master exports
-            exporter.saveState(system.getParticles());
-
         system.computeMPI();
+        if (world_rank == 0 && (i % 10 == 0)) // Only master exports
+            exporter.saveState(system.getParticles());
         MPI_Barrier(MPI_COMM_WORLD);
     }
 
@@ -84,24 +86,19 @@ int main()
     exporter.close();
 
 #if defined(_OPENMP)
-    omp_set_num_threads(4);
+    omp_set_num_threads(1);
 #endif // _OPENMP
-
-    if (world_rank == 0)
-    {
-        std::cout << "Number of OpenMP threads: " << omp_get_max_threads() << std::endl;
-        std::cout << "Computing without MPI " << std::endl;
-    }
 
     start = high_resolution_clock::now();
 
     if (world_rank == 0)
     {
-        // Classic version
-        for (int i = 0; i < 10; i++)
+        // Classic serial version
+        for (int i = 0; i < 100; i++)
         {
-            exporterTwo.saveState(systemTwo.getParticles());
-            systemTwo.compute();
+            systemSerial.computeSerial();
+            if (i % 10 == 0)
+                exporterTwo.saveState(systemSerial.getParticles());
         }
     }
 
@@ -109,7 +106,7 @@ int main()
     duration = duration_cast<milliseconds>(stop - start);
     if (world_rank == 0)
     {
-        std::cout << "Time taken by OMP execution: "
+        std::cout << "Time taken by serial execution: "
                   << duration.count() << " milliseconds" << std::endl;
     }
 

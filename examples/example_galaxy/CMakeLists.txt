@@ -13,9 +13,9 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-add_compile_options(-I../../../inc -L../../../build -I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization -Ofast -funroll-all-loops)
+add_compile_options(-I../../../include -L../../../build -I$ENV{mkBoostInc} -L$ENV{mkBoostLib} -lboost_iostreams -lboost_serialization -Ofast -funroll-all-loops)
 
-include_directories(../../inc)
+include_directories(../../include)
 
 add_library(NBodyEnvLibrary
 ../../src/Particle/Particle.cpp
