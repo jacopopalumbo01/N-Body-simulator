@@ -11,20 +11,8 @@ int main(int argc, char *argv[])
     // create a new ParticleSystem by passing the function which computes the gravitational force
     // the integration method to approximate the position numerically
     // and the time step used for the simulation over time
-    NBodyEnv::System<NBodyEnv::VerletDiscretizer> renderSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 10);
     NBodyEnv::System<NBodyEnv::VerletDiscretizer> system(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
     NBodyEnv::System<NBodyEnv::VerletDiscretizer> systemBH(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
-    // NBodyEnv::System<NBodyEnv::VerletDiscretizer> serialSystem(NBodyEnv::Functions::getGravFunc(), NBodyEnv::VerletDiscretizer(), 1);
-
-    // constexpr int numParticles = 2048;
-    // constexpr int timesteps = 3600 * 7;
-    // constexpr int timesteps = 360;
-
-    // Create exporter
-    NBodyEnv::Exporter exporter("test.part", 1);
-    // NBodyEnv::Exporter exporterBH("testBH.part", 60);
-    // NBodyEnv::Exporter exporterBH07("testBH07.part", 1);
-    // NBodyEnv::Exporter exporterBH10("testBH10.part", 1);
 
     // obtain a random number from hardware
     std::random_device rand;
@@ -73,10 +61,6 @@ int main(int argc, char *argv[])
         {
             // compute with direct-sum algorithm
             system.compute();
-            // if (i % 3 == 0)
-            // {
-            //     exporter.saveState(system.getParticles());
-            // }
         }
 
         auto stop = high_resolution_clock::now();
@@ -90,8 +74,7 @@ int main(int argc, char *argv[])
         std::cout << "Time taken by parallel execution: "
                   << durationDSparallel.count() << " milliseconds" << std::endl;
 
-        // std::cout << "DS speedup w.r.t serial: " << (double)durationDSserial.count() / (double)durationDSparallel.count() << std::endl;
-        // loop over all theta values and simulate the system
+       // loop over all theta values and simulate the system
         for (size_t i = 0; i < theta_vec.size(); i++)
         {
             root.SetTheta(theta_vec[i]);
@@ -100,10 +83,6 @@ int main(int argc, char *argv[])
             {
                 // compute with Barnes-Hut algorithm
                 systemBH.computeBH();
-                // if(i % 36 == 0)
-                // {
-                //     exporterBH.saveState(systemBH.getParticles());
-                // }
             }
 
             auto stop = high_resolution_clock::now();
@@ -125,13 +104,6 @@ int main(int argc, char *argv[])
             {
                 durationsBH10[k] = durationBH;
             }
-
-            // std::cout << "Theta = " << root.GetTheta() << " - Time taken by BH execution: "
-            //           << durationBH.count() << " milliseconds" << std::endl;
-
-            // print speedup between direct-sum DS and Barnes-Hut BH algorithm
-            // std::cout << "BH speedup w.r.t serial: " << (double)durationDSserial.count() / (double)durationBH.count() << std::endl;
-            // std::cout << "BH speedup w.r.t parallel: " << (double)durationDSparallel.count() / (double)durationBH.count() << std::endl;
         }
     }
 
