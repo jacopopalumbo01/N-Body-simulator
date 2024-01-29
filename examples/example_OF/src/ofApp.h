@@ -12,23 +12,17 @@ private:
     std::vector<double> time_steps_;
 	size_t iter_;
 
-	/* Camera utilities */
 	ofEasyCam camera_;
 	ofFbo fbo_;
-	// std::shared_ptr<ofxBloom> bloom_;
 	ofxBloom bloom_;
 	size_t body_number;
 	int scale_factor_;
-	/*
-	Will reset the simulation by clearing the bodies in the simulation and
-	resetting the time passed.
-  */
-	void ResetSimulation();
 
 public:
 	void setup();
 	void update();
 	void draw();
+	void ResetSimulation();
 
 	void keyPressed(int key);
 	void keyReleased(int key);
