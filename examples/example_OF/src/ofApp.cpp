@@ -19,13 +19,10 @@ void ofApp::setup()
 
 //--------------------------------------------------------------
 void ofApp::update()
-{
+{   
+    if(iter_ == time_steps_.size() - 1)
+        ResetSimulation();
     iter_++;
-    // if (iter_ == time_steps_.size())
-    // {
-    //     iter_ = 0;
-    //     draw();
-    // }
 }
 
 //--------------------------------------------------------------
@@ -82,24 +79,20 @@ void ofApp::draw()
             scale_factor_ *= 1.2;
         }
     }
-    // std::cout << "Scale factor " << scale_factor_ << std::endl;
 
     for (Vec v : particles_[iter_])
     {
         ofEnableAlphaBlending();
         // TODO: scale color with respect to mass / velocity
         ofSetColor(244, 107, 66);
-        // ofDrawSphere(v.x, v.y, v.z, 18);
-        ofDrawSphere(v.x / (scale_factor_*20), v.y / (scale_factor_*20), v.z / (scale_factor_*20), 7);
-        // ofDrawSphere(v.x / (scale_factor_*200), v.y / (scale_factor_*200), v.z / (scale_factor_*200), 5);
+        ofDrawSphere(v.x / (scale_factor_ * 17), v.y / (scale_factor_ * 17), v.z / (scale_factor_ * 17), 2);
     }
 
     camera_.end();
 
     fbo_.end();
 
-    bloom_.setBrightness(3);
-    // bloom_.setBrightness(2.5);
+    bloom_.setBrightness(2);
     bloom_.setScale(1);
     bloom_.setThreshold(.25);
     bloom_.process();
@@ -107,9 +100,7 @@ void ofApp::draw()
 
     ofSetColor(255, 255);
 
-    ofDrawBitmapString("1 - Generate static bodies", 100, 70);
-    ofDrawBitmapString("2 - Generate kinetic bodies", 100, 85);
-    ofDrawBitmapString("Left/Right for speed modification", 100, 100);
+    ofDrawBitmapString("1 - Reset Simulation", 100, 100);
 
     string frame_rate = "Frame rate: " + ofToString(ofGetFrameRate(), 2);
     ofDrawBitmapString(frame_rate, 100, 135);
@@ -118,25 +109,26 @@ void ofApp::draw()
     ofDrawBitmapString(timeStep, 100, 150);
 }
 
+void ofApp::ResetSimulation()
+{
+    particles_.clear();
+    time_steps_.clear();
+    Parser parser = Parser("test.part", 1.0);
+    particles_ = parser.getParticles();
+    time_steps_ = parser.getTime();
+    iter_ = 0;
+    scale_factor_ = 1;
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key)
 {
-    //     switch (key) {
-    //     case OF_KEY_RIGHT:
-    //       time_step_ *= 2;
-    //       break;
-    //     case OF_KEY_LEFT:
-    //       time_step_ /= 2;
-    //       break;
-    //     case '1':
-    //       ResetSimulation();
-    //       GenerateStaticBodies();
-    //       break;
-    //     case '2':
-    //       ResetSimulation();
-    //       GenerateKineticBodies();
-    //       break;
-    //   }
+    switch (key)
+    {
+    case '1':
+        ResetSimulation();
+        break;
+    }
 }
 
 //--------------------------------------------------------------

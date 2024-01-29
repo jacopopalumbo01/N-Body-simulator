@@ -10,6 +10,9 @@ Project developed for Advanced Methods for Scientific Computing course of the HP
 3. Elia Vaglietti (elia.vaglietti@mail.polimi.it)
   
 
+https://github.com/jacopopalumbo01/N-Body-simulator/assets/118806991/f738d2ce-ca76-4ffa-825d-c1245f023a73
+
+
 ## Overview
 
 This project is an N-body gravitational simulator designed to model the interactions between multiple celestial objects under the influence of gravity. The N-body problem is a classical problem in physics and astrodynamics that involves predicting the motions of a group of celestial bodies as they interact with each other through gravitational forces.
